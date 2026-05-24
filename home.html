@@ -1,1 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mamaspace • for moms & babies</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    body {
+      font-family: 'Segoe UI', system-ui, Arial, sans-serif;
+      background: linear-gradient(135deg, #fff0f5, #e0f2fe, #f0f9ff);
+      color: #4a2c4f;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Container to center the app */
+    .page-container {
+      width: 100%;
+      max-width: 1250px;
+      margin: 20px auto;
+      box-shadow: 0 20px 60px rgba(255, 143, 171, 0.25);
+      border-radius: 28px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* Soft Background Glows */
+    .background-glow, .background-glow2 {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .background-glow {
+      width: 700px;
+      height: 700px;
+      background: #ff8fab;
+      top: -200px;
+      right: -150px;
+    }
+
+    .background-glow2 {
+      width: 600px;
+      height: 600px;
+      background: #7ed6ff;
+      bottom: -180px;
+      left: -150px;
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+      max-height: 100vh;
+    }
+
+    /* LEFT SIDEBAR */
+    .sidebar {
+      width: 280px;
+      padding: 24px;
+      border-right: 1px solid rgba(255, 105, 180, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #ff8fab, #7ed6ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 20px;
+      border-radius: 9999px;
+      color: #6b4e71;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: rgba(255, 143, 171, 0.15);
+      color: #ff4d94;
+    }
+
+    .nav-item i {
+      font-size: 24px;
+    }
+
+    /* MAIN FEED */
+    .main {
+      flex: 1;
+      max-width: 620px;
+      border-right: 1px solid rgba(255, 105, 180, 0.15);
+      padding: 20px;
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .header {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 105, 180, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      position: sticky;
+      top: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      z-index: 10;
+    }
+
+    .header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ff4d94;
+    }
+
+    .compose {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 143, 171, 0.2);
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 15px rgba(255, 143, 171, 0.1);
+    }
+
+    .compose-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #4a2c4f;
+      font-size: 17px;
+      resize: none;
+      height: 70px;
+    }
+
+    .post-btn {
+      background: linear-gradient(135deg, #ff8fab, #7ed6ff);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 9999px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 6px 20px rgba(255, 143, 171, 0.3);
+    }
+
+    .post-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(255, 143, 171, 0.4);
+    }
+
+    /* POST */
+    .post {
+      background: white;
+      border: 1px solid rgba(255, 143, 171, 0.2);
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff8fab, #7ed6ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      border: 3px solid white;
+      box-shadow: 0 4px 10px rgba(255, 143, 171, 0.3);
+    }
+
+    .post-content {
+      margin: 16px 0;
+      line-height: 1.6;
+      font-size: 16.5px;
+      color: #43324a;
+    }
+
+    .post-image {
+      width: 100%;
+      border-radius: 18px;
+      margin: 12px 0;
+      border: 1px solid rgba(255, 143, 171, 0.2);
+    }
+
+    /* RIGHT SIDEBAR */
+    .right-sidebar {
+      width: 300px;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+    }
+
+    .widget {
+      background: white;
+      border: 1px solid rgba(255, 143, 171, 0.2);
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .widget h3 {
+      margin-bottom: 16px;
+      color: #ff4d94;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+  <div class="background-glow"></div>
+  <div class="background-glow2"></div>
+
+  <!-- Centered Container -->
+  <div class="page-container">
+    <div class="app">
+      <!-- LEFT SIDEBAR -->
+      <div class="sidebar">
+        <div class="logo">
+          <span>🍼</span> MAMASPACE
+        </div>
+        
+        <div class="nav">
+          <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> Home</a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i> Explore</a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-heart"></i> Mom Circle</a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-baby"></i> Baby Milestones</a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-bell"></i> Notifications</a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-envelope"></i> Messages</a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-user"></i> My Profile</a>
+        </div>
+
+        <button onclick="alert('Share your mom moment 💕')" 
+                style="margin-top: auto; padding: 16px; background: linear-gradient(135deg, #ff8fab, #7ed6ff); border: none; border-radius: 9999px; color: white; font-weight: bold; font-size: 17px; cursor: pointer;">
+          <i class="fa-solid fa-feather-pointed"></i> Share Moment
+        </button>
+      </div>
+
+      <!-- MAIN FEED -->
+      <div class="main">
+        <div class="header">
+          <h1>Home Feed</h1>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <input type="text" placeholder="Search mom tips, baby names..." 
+                   style="background:rgba(255,255,255,0.9); border:1px solid #ff8fab; border-radius:9999px; padding:10px 20px; width:300px; color:#4a2c4f;">
+            <div class="avatar" style="width:38px;height:38px;font-size:18px;">👩‍🍼</div>
+          </div>
+        </div>
+
+        <!-- COMPOSE -->
+        <div class="compose">
+          <div style="display:flex; gap:14px;">
+            <div class="avatar" style="width:48px;height:48px;font-size:26px;">👩‍🍼</div>
+            <textarea class="compose-input" placeholder="What's on your mind, mama? How's your little one today? 💕"></textarea>
+          </div>
+          
+          <div class="compose-actions" style="margin-top:16px; padding-top:16px; border-top:1px solid #ffe4f0;">
+            <div style="display:flex; gap:16px; color:#ff8fab;">
+              <i class="fa-solid fa-image"></i>
+              <i class="fa-solid fa-heart"></i>
+              <i class="fa-solid fa-baby"></i>
+            </div>
+            <button class="post-btn">Post to Mamaspace</button>
+          </div>
+        </div>
+
+        <!-- Sample Posts -->
+        <div class="post">
+          <div class="post-header" style="display:flex; gap:12px; margin-bottom:12px;">
+            <div class="avatar">👩🏻</div>
+            <div>
+              <div class="post-user">Sarah MomOfTwo</div>
+              <div style="color:#888;">@sarahandluna • 2h</div>
+            </div>
+          </div>
+          <div class="post-content">
+            My baby girl finally slept through the night! 😭💕 6 months of struggle but we made it mamas! Who's celebrating small wins today?
+          </div>
+          <img src="https://picsum.photos/id/1015/600/400" class="post-image" alt="Baby sleeping">
+          <div style="color:#ff8fab; margin-top:10px;">❤️ 248 • 💬 67</div>
+        </div>
+
+        <div class="post">
+          <div class="post-header" style="display:flex; gap:12px; margin-bottom:12px;">
+            <div class="avatar">🧸</div>
+            <div>
+              <div class="post-user">LilaTheNewMom</div>
+              <div style="color:#888;">@lilabean • 5h</div>
+            </div>
+          </div>
+          <div class="post-content">
+            Quick tip for teething babies: frozen breastmilk in a mesh feeder is a lifesaver! Saved us last night. What are your go-to teething hacks? 🍼
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="right-sidebar">
+        <div class="widget">
+          <h3>🌟 Trending in Mamaspace</h3>
+          <div style="padding:10px 0; border-bottom:1px solid #ffe4f0;">#SleepTraining</div>
+          <div style="padding:10px 0; border-bottom:1px solid #ffe4f0;">#FirstFoods</div>
+          <div style="padding:10px 0;">#MomGuiltIsReal</div>
+        </div>
+
+        <div class="widget">
+          <h3>Suggested Mamas</h3>
+          <div class="user-suggestion" style="display:flex; align-items:center; gap:12px; margin:16px 0;">
+            <div class="avatar" style="width:42px;height:42px;font-size:20px;">🌸</div>
+            <div style="flex:1;">
+              <div>Emma • First Time Mom</div>
+              <div style="font-size:13px;color:#888;">2.4k mamas following</div>
+            </div>
+            <button class="follow-btn" style="background:#ffe4f0;color:#ff4d94;border:none;padding:6px 16px;border-radius:9999px;">Follow</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
