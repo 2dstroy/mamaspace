@@ -1,1 +1,140 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+body {
+  font-family: 'Segoe UI', system-ui, Arial, sans-serif;
+  background: linear-gradient(135deg, #fff0f5, #e0f2fe, #f0f9ff);
+  color: #4a2c4f;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.background-glow,
+.background-glow2 {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  z-index: -1;
+}
+
+.background-glow {
+  width: 800px;
+  height: 800px;
+  background: #ff8fab;
+  top: -300px;
+  right: -200px;
+}
+
+.background-glow2 {
+  width: 700px;
+  height: 700px;
+  background: #7ed6ff;
+  bottom: -250px;
+  left: -200px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  width: 100%;
+}
+
+.hero-content {
+  flex: 1;
+}
+
+.logo {
+  font-size: 42px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #ff8fab, #7ed6ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: 58px;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: #4a2c4f;
+}
+
+p {
+  font-size: 22px;
+  color: #6b4e71;
+  margin-bottom: 40px;
+  max-width: 500px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 16px 36px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ff8fab, #7ed6ff);
+  color: white;
+  border: none;
+  box-shadow: 0 8px 25px rgba(255, 143, 171, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 30px rgba(255, 143, 171, 0.5);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #ff4d94;
+  border: 2px solid #ff8fab;
+}
+
+.hero-image {
+  flex: 1;
+  text-align: center;
+}
+
+.hero-image img {
+  max-width: 520px;
+  border-radius: 40px;
+  box-shadow: 0 30px 60px rgba(255, 143, 171, 0.3);
+}
+
+.nav {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  display: flex;
+  gap: 16px;
+}
