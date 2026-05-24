@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join Mamaspace • Sign Up</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-pink-50 via-purple-50 to-white min-h-screen flex items-center justify-center relative overflow-hidden">
+
+  <!-- Background Glows -->
+  <div class="fixed inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(236,72,153,0.25),transparent)]"></div>
+  <div class="fixed inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(168,85,247,0.25),transparent)]"></div>
+
+  <div class="relative z-10 max-w-md w-full px-6 py-12">
+    <div class="bg-white rounded-3xl p-8 shadow-2xl">
+
+      <div class="text-center mb-8">
+        <div class="inline-flex w-16 h-16 bg-pink-100 rounded-2xl items-center justify-center mb-4">
+          <i class="fa-solid fa-baby text-4xl text-pink-500"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900">Welcome to the sisterhood ❤️</h1>
+        <p class="text-gray-600 mt-2">Join thousands of moms supporting each other</p>
+      </div>
+
+      <form id="signupForm" class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+          <input type="text" id="name" placeholder="e.g. Sarah Chen" required
+                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+          <input type="email" id="email" placeholder="you@example.com" required
+                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input type="password" id="password" placeholder="Create a strong password (min 6 chars)" required
+                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Confirm your password" required
+                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Baby's Age or Due Date <span class="text-xs text-gray-400">(Optional)</span></label>
+          <input type="text" id="babyInfo" placeholder="e.g. 6 months old or Due Aug 2026"
+                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500">
+        </div>
+
+        <button type="submit" id="submitBtn"
+                class="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-4 rounded-2xl text-lg shadow-lg flex items-center justify-center gap-2 transition-all">
+          <i class="fa-solid fa-heart"></i>
+          Join the Sisterhood
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // === Firebase Imports ===
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+
+    // Your Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
+      authDomain: "mamaspace-bf004.firebaseapp.com",
+      projectId: "mamaspace-bf004",
+      storageBucket: "mamaspace-bf004.firebasestorage.app",
+      messagingSenderId: "520083469560",
+      appId: "1:520083469560:web:d83cec2ce32ba0fa1bf70d",
+      measurementId: "G-HFLW3BTN9E"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Form Handling
+    const form = document.getElementById('signupForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const babyInfo = document.getElementById('babyInfo').value.trim();
+
+      // Basic Validation
+      if (password !== confirmPassword) {
+        alert("❌ Passwords do not match!");
+        return;
+      }
+      if (password.length < 6) {
+        alert("❌ Password must be at least 6 characters long.");
+        return;
+      }
+
+      // Loading State
+      const originalBtnText = submitBtn.innerHTML;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Creating account...`;
+      submitBtn.disabled = true;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        console.log("✅ User created:", user);
+        
+        alert(`🎉 Welcome to Mamaspace, ${name || 'Mama'}! Your account has been created successfully.`);
+
+        // You can redirect to dashboard here
+        // window.location.href = "dashboard.html";
+
+        form.reset();
+
+      } catch (error) {
+        console.error(error);
+        let message = "Something went wrong. Please try again.";
+
+        if (error.code === 'auth/email-already-in-use') {
+          message = "This email is already registered. Try signing in instead.";
+        } else if (error.code === 'auth/invalid-email') {
+          message = "Please enter a valid email address.";
+        } else if (error.code === 'auth/weak-password') {
+          message = "Password is too weak. Try a stronger one.";
+        }
+
+        alert(`❌ ${message}`);
+      } finally {
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
