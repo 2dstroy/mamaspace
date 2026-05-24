@@ -29,64 +29,127 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
           <input type="text" id="name" placeholder="e.g. Sarah Chen" required
-                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500">
+                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500 transition-colors">
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
           <input type="email" id="email" placeholder="you@example.com" required
-                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500">
+                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500 transition-colors">
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-          <input type="password" id="password" placeholder="Create a strong password (min 6 chars)" required
-                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500">
+          <input type="password" id="password" placeholder="Min 6 characters" required minlength="6"
+                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500 transition-colors">
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
           <input type="password" id="confirmPassword" placeholder="Confirm your password" required
-                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500">
+                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500 transition-colors">
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Baby's Age or Due Date <span class="text-xs text-gray-400">(Optional)</span></label>
           <input type="text" id="babyInfo" placeholder="e.g. 6 months old or Due Aug 2026"
-                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500">
+                 class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500 transition-colors">
         </div>
 
         <button type="submit" id="submitBtn"
-                class="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-4 rounded-2xl text-lg shadow-lg flex items-center justify-center gap-2 transition-all">
-          <i class="fa-solid fa-heart"></i>
-          Join the Sisterhood
+                class="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-4 rounded-2xl text-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-70">
+          <span id="btnText">Join the Sisterhood</span>
+          <i id="btnIcon" class="fa-solid fa-heart"></i>
         </button>
       </form>
+
+      <p class="text-center text-xs text-gray-500 mt-6">
+        By joining, you agree to our <span class="text-pink-500">Terms</span> and <span class="text-pink-500">Privacy Policy</span>
+      </p>
     </div>
   </div>
 
- <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
-    authDomain: "mamaspace-bf004.firebaseapp.com",
-    projectId: "mamaspace-bf004",
-    storageBucket: "mamaspace-bf004.firebasestorage.app",
-    messagingSenderId: "520083469560",
-    appId: "1:520083469560:web:d83cec2ce32ba0fa1bf70d",
-    measurementId: "G-HFLW3BTN9E"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
+      authDomain: "mamaspace-bf004.firebaseapp.com",
+      projectId: "mamaspace-bf004",
+      storageBucket: "mamaspace-bf004.firebasestorage.app",
+      messagingSenderId: "520083469560",
+      appId: "1:520083469560:web:d83cec2ce32ba0fa1bf70d"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const form = document.getElementById("signupForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const btnText = document.getElementById("btnText");
+    const btnIcon = document.getElementById("btnIcon");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      const babyInfo = document.getElementById("babyInfo").value.trim();
+
+      // Validation
+      if (password.length < 6) {
+        alert("Password must be at least 6 characters long.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      // Loading state
+      submitBtn.disabled = true;
+      btnText.textContent = "Creating account...";
+      btnIcon.classList.remove("fa-heart");
+      btnIcon.classList.add("fa-spinner", "fa-spin");
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        console.log("User created:", user);
+
+        // You can save additional data (name, babyInfo) to Firestore here
+
+        alert(`Welcome to Mamaspace, ${name}! ❤️\nYour account has been created successfully.`);
+        
+        // Redirect after success (change to your dashboard URL)
+        // window.location.href = "/dashboard.html";
+
+      } catch (error) {
+        console.error(error);
+        let message = "Something went wrong. Please try again.";
+        
+        if (error.code === "auth/email-already-in-use") {
+          message = "This email is already registered.";
+        } else if (error.code === "auth/invalid-email") {
+          message = "Please enter a valid email address.";
+        } else if (error.code === "auth/weak-password") {
+          message = "Password is too weak.";
+        }
+        
+        alert(message);
+      } finally {
+        // Reset button
+        submitBtn.disabled = false;
+        btnText.textContent = "Join the Sisterhood";
+        btnIcon.classList.add("fa-heart");
+        btnIcon.classList.remove("fa-spinner", "fa-spin");
+      }
+    });
+  </script>
 </body>
 </html>
