@@ -63,7 +63,6 @@
     }
 
     /* SIDEBAR */
-
     .sidebar{
       width:260px;
       padding:24px;
@@ -131,7 +130,6 @@
     }
 
     /* MAIN */
-
     .main{
       flex:1;
       padding:20px;
@@ -148,7 +146,6 @@
       padding:15px 0;
       margin-bottom:20px;
       border-bottom:1px solid rgba(255,105,180,0.15);
-
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -190,7 +187,6 @@
     }
 
     /* COMPOSE */
-
     .compose{
       background:white;
       border:1px solid rgba(255,143,171,0.2);
@@ -245,7 +241,6 @@
     }
 
     /* POSTS */
-
     .post{
       background:white;
       border:1px solid rgba(255,143,171,0.2);
@@ -285,7 +280,6 @@
     }
 
     /* RIGHT SIDEBAR */
-
     .right-sidebar{
       width:300px;
       padding:24px;
@@ -332,50 +326,19 @@
     }
 
     /* MOBILE */
-
     @media (max-width: 1024px){
-
-      .right-sidebar{
-        display:none;
-      }
-
-      .sidebar{
-        width:90px;
-        align-items:center;
-      }
-
-      .logo{
-        font-size:0;
-      }
-
-      .logo span{
-        font-size:34px;
-      }
-
-      .nav-item{
-        justify-content:center;
-        padding:16px;
-      }
-
-      .nav-item span{
-        display:none;
-      }
-
-      .share-btn{
-        font-size:0;
-      }
-
-      .share-btn i{
-        font-size:22px;
-      }
+      .right-sidebar{ display:none; }
+      .sidebar{ width:90px; align-items:center; }
+      .logo{ font-size:0; }
+      .logo span{ font-size:34px; }
+      .nav-item{ justify-content:center; padding:16px; }
+      .nav-item span{ display:none; }
+      .share-btn{ font-size:0; }
+      .share-btn i{ font-size:22px; }
     }
 
     @media (max-width: 768px){
-
-      .app{
-        flex-direction:column;
-      }
-
+      .app{ flex-direction:column; }
       .sidebar{
         width:100%;
         flex-direction:row;
@@ -385,74 +348,24 @@
         border-bottom:1px solid rgba(255,105,180,0.15);
         padding:14px;
       }
-
-      .nav{
-        flex-direction:row;
-        gap:10px;
-      }
-
-      .nav-item{
-        min-width:56px;
-        justify-content:center;
-      }
-
-      .main{
-        border-right:none;
-        padding:15px;
-      }
-
-      .header{
-        flex-direction:column;
-        align-items:flex-start;
-      }
-
-      .search-box{
-        width:100%;
-      }
-
-      .search-input{
-        width:100%;
-      }
-
-      .compose-actions{
-        flex-direction:column;
-        align-items:flex-start;
-      }
-
-      .post{
-        padding:16px;
-      }
+      .nav{ flex-direction:row; gap:10px; }
+      .nav-item{ min-width:56px; justify-content:center; }
+      .main{ border-right:none; padding:15px; }
+      .header{ flex-direction:column; align-items:flex-start; }
+      .search-box{ width:100%; }
+      .search-input{ width:100%; }
+      .compose-actions{ flex-direction:column; align-items:flex-start; }
+      .post{ padding:16px; }
     }
 
     @media (max-width: 480px){
-
-      .header h1{
-        font-size:22px;
-      }
-
-      .compose{
-        padding:16px;
-      }
-
-      .compose-top{
-        flex-direction:column;
-      }
-
-      .avatar{
-        width:42px;
-        height:42px;
-        font-size:20px;
-      }
-
-      .post-content{
-        font-size:15px;
-      }
-
-      .post-btn{
-        width:100%;
-      }
+      .header h1{ font-size:22px; }
+      .compose{ padding:16px; }
+      .compose-top{ flex-direction:column; }
+      .avatar{ width:42px; height:42px; font-size:20px; }
+      .post-content{ font-size:15px; }
+      .post-btn{ width:100%; }
     }
-
   </style>
 </head>
 
@@ -462,207 +375,166 @@
   <div class="background-glow2"></div>
 
   <div class="page-container">
-
     <div class="app">
 
       <!-- SIDEBAR -->
       <div class="sidebar">
-
         <div class="logo">
           <span>🍼</span> MAMASPACE
         </div>
 
         <div class="nav">
-          <a href="#" class="nav-item active">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-          </a>
-
-          <a href="#" class="nav-item">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <span>Explore</span>
-          </a>
-
-          <a href="#" class="nav-item">
-            <i class="fa-solid fa-heart"></i>
-            <span>Mom Circle</span>
-          </a>
-
-          <a href="#" class="nav-item">
-            <i class="fa-solid fa-baby"></i>
-            <span>Baby Milestones</span>
-          </a>
-
-          <a href="#" class="nav-item">
-            <i class="fa-solid fa-bell"></i>
-            <span>Notifications</span>
-          </a>
-
-          <a href="#" class="nav-item">
-            <i class="fa-solid fa-envelope"></i>
-            <span>Messages</span>
-          </a>
-
-          <a href="#" class="nav-item">
-            <i class="fa-solid fa-user"></i>
-            <span>Profile</span>
-          </a>
+          <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>Explore</span></a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-heart"></i><span>Mom Circle</span></a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-baby"></i><span>Baby Milestones</span></a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-envelope"></i><span>Messages</span></a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-user"></i><span>Profile</span></a>
         </div>
 
         <button class="share-btn">
           <i class="fa-solid fa-feather-pointed"></i>
           Share Moment
         </button>
-
       </div>
 
       <!-- MAIN -->
       <div class="main">
-
         <div class="header">
           <h1>Home Feed</h1>
-
           <div class="search-box">
-            <input
-              type="text"
-              class="search-input"
-              placeholder="Search mom tips..."
-            >
-
+            <input type="text" class="search-input" placeholder="Search mom tips...">
             <div class="avatar">👩‍🍼</div>
           </div>
         </div>
 
         <!-- COMPOSE -->
         <div class="compose">
-
           <div class="compose-top">
-
             <div class="avatar">👩‍🍼</div>
-
-            <textarea
-              class="compose-input"
-              placeholder="What's on your mind, mama? 💕"
-            ></textarea>
-
+            <textarea class="compose-input" placeholder="What's on your mind, mama? 💕"></textarea>
           </div>
 
           <div class="compose-actions">
-
             <div class="compose-icons">
               <i class="fa-solid fa-image"></i>
               <i class="fa-solid fa-heart"></i>
               <i class="fa-solid fa-baby"></i>
             </div>
-
-            <button class="post-btn">
-              Post to Mamaspace
-            </button>
-
+            <button class="post-btn">Post to Mamaspace</button>
           </div>
-
         </div>
 
-        <!-- POST 1 -->
-        <div class="post">
-
-          <div class="post-header">
-
-            <div class="avatar">👩🏻</div>
-
-            <div>
-              <div class="post-user">Sarah MomOfTwo</div>
-              <div style="color:#888;">@sarahandluna • 2h</div>
-            </div>
-
-          </div>
-
-          <div class="post-content">
-            My baby girl finally slept through the night! 😭💕
-            6 months of struggle but we made it mamas!
-          </div>
-
-          <img
-            src="https://picsum.photos/id/1015/600/400"
-            class="post-image"
-            alt="Baby sleeping"
-          >
-
-          <div class="post-footer">
-            ❤️ 248 • 💬 67
-          </div>
-
-        </div>
-
-        <!-- POST 2 -->
-        <div class="post">
-
-          <div class="post-header">
-
-            <div class="avatar">🧸</div>
-
-            <div>
-              <div class="post-user">LilaTheNewMom</div>
-              <div style="color:#888;">@lilabean • 5h</div>
-            </div>
-
-          </div>
-
-          <div class="post-content">
-            Frozen breastmilk in a mesh feeder is a lifesaver for teething babies 🍼💕
-          </div>
-
-          <div class="post-footer">
-            ❤️ 120 • 💬 32
-          </div>
-
-        </div>
-
+        <!-- Dynamic Posts Container -->
+        <div id="posts-container"></div>
       </div>
 
       <!-- RIGHT SIDEBAR -->
       <div class="right-sidebar">
-
         <div class="widget">
-
           <h3>🌟 Trending</h3>
-
           <div class="trend-item">#SleepTraining</div>
           <div class="trend-item">#FirstFoods</div>
           <div class="trend-item">#MomGuiltIsReal</div>
-
         </div>
 
         <div class="widget">
-
           <h3>Suggested Mamas</h3>
-
           <div class="user-suggestion">
-
-            <div class="avatar" style="width:42px;height:42px;font-size:20px;">
-              🌸
-            </div>
-
+            <div class="avatar" style="width:42px;height:42px;font-size:20px;">🌸</div>
             <div style="flex:1;">
               <div>Emma • First Time Mom</div>
-              <div style="font-size:13px;color:#888;">
-                2.4k followers
-              </div>
+              <div style="font-size:13px;color:#888;">2.4k followers</div>
             </div>
-
-            <button class="follow-btn">
-              Follow
-            </button>
-
+            <button class="follow-btn">Follow</button>
           </div>
-
         </div>
-
       </div>
-
     </div>
-
   </div>
 
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc,
+  onSnapshot 
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+// 🔥 YOUR FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
+  authDomain: "mamaspace-bf004.firebaseapp.com",
+  projectId: "mamaspace-bf004",
+  storageBucket: "mamaspace-bf004.firebasestorage.app",
+  messagingSenderId: "520083469560",
+  appId: "1:520083469560:web:d83cec2ce32ba0fa1bf70d"
+};
+
+// INIT FIREBASE
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// UI ELEMENTS
+const postBtn = document.querySelector(".post-btn");
+const textarea = document.querySelector(".compose-input");
+const postsContainer = document.getElementById("posts-container");
+
+// CREATE POST
+postBtn.addEventListener("click", async () => {
+  const text = textarea.value.trim();
+
+  if (!text) {
+    alert("Write something first 💕");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "posts"), {
+      user: "Mama User",
+      username: "@mama",
+      avatar: "👩‍🍼",
+      content: text,
+      createdAt: Date.now()        // ← FIX #1
+    });
+
+    textarea.value = "";
+  } catch (err) {
+    console.error(err);
+    alert("Failed to post");
+  }
+});
+
+// REALTIME LIVE FEED - Simplified & Safer
+onSnapshot(collection(db, "posts"), (snapshot) => {   // ← FIX #2
+  postsContainer.innerHTML = "";
+
+  snapshot.forEach((doc) => {
+    const post = doc.data();
+
+    postsContainer.innerHTML += `
+      <div class="post">
+        <div class="post-header">
+          <div class="avatar">${post.avatar || "👩‍🍼"}</div>
+          <div>
+            <div class="post-user">${post.user || "User"}</div>
+            <div style="color:#888;">${post.username || "@user"}</div>
+          </div>
+        </div>
+
+        <div class="post-content">
+          ${post.content}
+        </div>
+
+        <div class="post-footer">
+          ❤️ 0 • 💬 0
+        </div>
+      </div>
+    `;
+  });
+});
+</script>
 </body>
 </html>
