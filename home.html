@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,50 +24,77 @@
     .background-glow{ width:500px; height:500px; background:#ff8fab; top:-150px; right:-150px; }
     .background-glow2{ width:450px; height:450px; background:#7ed6ff; bottom:-150px; left:-150px; }
 
-    .page-container{
-      width:100%; max-width:1400px; margin:auto; min-height:100vh;
-      background:rgba(255,255,255,0.92); backdrop-filter:blur(16px);
+    .app{ display:flex; min-height:100vh; max-width:1400px; margin:auto; }
+
+    /* SIDEBAR */
+    .sidebar{ 
+      width:260px; padding:24px; border-right:1px solid rgba(255,105,180,0.15);
+      background:rgba(255,255,255,0.85); backdrop-filter:blur(16px);
+      display:flex; flex-direction:column; gap:28px; position:sticky; top:0; height:100vh;
+    }
+    .logo{ 
+      font-size:30px; font-weight:800; 
+      background:linear-gradient(90deg,#ff8fab,#7ed6ff);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; 
+      display:flex; align-items:center; gap:10px; 
+    }
+    .nav{ display:flex; flex-direction:column; gap:8px; }
+    .nav-item{ 
+      display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:9999px;
+      text-decoration:none; color:#6b4e71; font-weight:600; transition:0.3s; 
+    }
+    .nav-item:hover, .nav-item.active{ 
+      background:rgba(255,143,171,0.15); color:#ff4d94; 
+    }
+    .nav-item i{ font-size:20px; }
+
+    .share-btn{ 
+      margin-top:auto; padding:15px; border:none; border-radius:9999px;
+      background:linear-gradient(135deg,#ff8fab,#7ed6ff); color:white; 
+      font-size:16px; font-weight:bold; cursor:pointer; transition:0.3s; 
     }
 
-    .app{ display:flex; min-height:100vh; }
-
-    .sidebar{ width:260px; padding:24px; border-right:1px solid rgba(255,105,180,0.15);
-      background:rgba(255,255,255,0.75); display:flex; flex-direction:column; gap:28px; }
-    .logo{ font-size:30px; font-weight:800; background:linear-gradient(90deg,#ff8fab,#7ed6ff);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; display:flex; align-items:center; gap:10px; }
-    .nav{ display:flex; flex-direction:column; gap:8px; }
-    .nav-item{ display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:9999px;
-      text-decoration:none; color:#6b4e71; font-weight:600; transition:0.3s; }
-    .nav-item:hover, .nav-item.active{ background:rgba(255,143,171,0.15); color:#ff4d94; }
-    .nav-item i{ font-size:20px; }
-    .share-btn{ margin-top:auto; padding:15px; border:none; border-radius:9999px;
-      background:linear-gradient(135deg,#ff8fab,#7ed6ff); color:white; font-size:16px;
-      font-weight:bold; cursor:pointer; transition:0.3s; }
-
-    .main{ flex:1; padding:20px; overflow-y:auto; border-right:1px solid rgba(255,105,180,0.15); }
-    .header{ position:sticky; top:0; z-index:20; background:rgba(255,255,255,0.95);
+    /* MAIN CONTENT */
+    .main{ 
+      flex:1; padding:20px; overflow-y:auto; 
+    }
+    .header{ 
+      position:sticky; top:0; z-index:20; background:rgba(255,255,255,0.95);
       backdrop-filter:blur(12px); padding:15px 0; margin-bottom:20px;
-      border-bottom:1px solid rgba(255,105,180,0.15); display:flex; align-items:center;
-      justify-content:space-between; gap:15px; }
+      border-bottom:1px solid rgba(255,105,180,0.15); 
+      display:flex; align-items:center; justify-content:space-between; 
+    }
     .header h1{ color:#ff4d94; font-size:28px; }
 
     .avatar{
-      width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,#ff8fab,#7ed6ff);
+      width:48px; height:48px; border-radius:50%; 
+      background:linear-gradient(135deg,#ff8fab,#7ed6ff);
       display:flex; align-items:center; justify-content:center; font-size:24px;
-      flex-shrink:0; border:3px solid white; box-shadow:0 4px 10px rgba(255,143,171,0.3);
+      border:3px solid white; box-shadow:0 4px 10px rgba(255,143,171,0.3);
     }
 
-    .compose{ background:white; border:1px solid rgba(255,143,171,0.2); border-radius:24px;
-      padding:20px; margin-bottom:24px; box-shadow:0 4px 15px rgba(255,143,171,0.1); }
+    /* Compose */
+    .compose{ 
+      background:white; border:1px solid rgba(255,143,171,0.2); border-radius:24px;
+      padding:20px; margin-bottom:24px; box-shadow:0 4px 15px rgba(255,143,171,0.1); 
+    }
     .compose-top{ display:flex; gap:14px; }
-    .compose-input{ width:100%; border:none; outline:none; resize:none; background:transparent;
-      font-size:16px; color:#4a2c4f; min-height:80px; }
-    .compose-actions{ display:flex; justify-content:space-between; align-items:center;
-      margin-top:16px; padding-top:16px; border-top:1px solid #ffe4f0; flex-wrap:wrap; gap:12px; }
-    .compose-icons{ display:flex; gap:16px; color:#ff8fab; font-size:20px; cursor:pointer; }
-    .post-btn{ border:none; padding:12px 28px; border-radius:9999px;
-      background:linear-gradient(135deg,#ff8fab,#7ed6ff); color:white; font-weight:bold; cursor:pointer; }
+    .compose-input{ 
+      width:100%; border:none; outline:none; resize:none; background:transparent;
+      font-size:16px; color:#4a2c4f; min-height:90px; 
+    }
+    .compose-actions{ 
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:16px; padding-top:16px; border-top:1px solid #ffe4f0; 
+    }
+    .compose-icons{ display:flex; gap:16px; color:#ff8fab; font-size:22px; cursor:pointer; }
+    .post-btn{ 
+      border:none; padding:12px 32px; border-radius:9999px;
+      background:linear-gradient(135deg,#ff8fab,#7ed6ff); color:white; 
+      font-weight:bold; cursor:pointer; 
+    }
 
+    /* Posts */
     .post{
       background:white; border:1px solid rgba(255,143,171,0.2); border-radius:24px;
       padding:20px; margin-bottom:20px; box-shadow:0 4px 15px rgba(0,0,0,0.05);
@@ -76,33 +102,33 @@
     .post-header{ display:flex; gap:12px; margin-bottom:12px; }
     .post-user{ font-weight:700; }
     .post-content{ line-height:1.6; font-size:16px; margin:14px 0; }
-    .post-image{ width:100%; border-radius:18px; border:1px solid rgba(255,143,171,0.2); margin-top:10px; }
+    .post-image{ width:100%; border-radius:18px; margin-top:12px; }
 
-    /* Like & Comment Footer */
     .post-footer{
       margin-top:16px; padding-top:12px; border-top:1px solid #ffe4f0;
       display:flex; gap:20px; color:#ff4d94; font-size:15px;
     }
     .action-btn{
-      display:flex; align-items:center; gap:6px; cursor:pointer; padding:6px 12px;
-      border-radius:9999px; transition:0.2s;
+      display:flex; align-items:center; gap:6px; cursor:pointer; 
+      padding:6px 12px; border-radius:9999px; transition:0.2s;
     }
     .action-btn:hover{ background:rgba(255,77,148,0.1); }
-    .action-btn.liked{ color:#ff4d94; }
 
-    .comments-section{
-      margin-top:12px; padding-top:12px; border-top:1px solid #ffe4f0;
+    .comment-section{
+      margin-top:15px; padding-top:12px; border-top:1px solid #ffe4f0;
       display:none;
     }
     .comment{
-      display:flex; gap:10px; margin-bottom:10px; font-size:14px;
+      background:#fff0f5; padding:10px 14px; border-radius:12px; margin-bottom:8px; font-size:14.5px;
     }
     .comment-input{
       display:flex; gap:8px; margin-top:10px;
     }
     .comment-input input{
-      flex:1; padding:10px 14px; border:1px solid #ffc2e0; border-radius:9999px;
-      outline:none;
+      flex:1; padding:10px 14px; border:1px solid #ffc2e0; border-radius:9999px; outline:none;
+    }
+    .comment-input button{
+      border:none; background:#ff4d94; color:white; padding:10px 18px; border-radius:9999px; cursor:pointer;
     }
   </style>
 </head>
@@ -111,75 +137,62 @@
   <div class="background-glow"></div>
   <div class="background-glow2"></div>
 
-  <div class="page-container">
-    <div class="app">
+  <div class="app">
 
-      <!-- SIDEBAR -->
-      <div class="sidebar">
-        <div class="logo"><span>🍼</span> MAMASPACE</div>
-        <div class="nav">
-          <a href="home.html" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
-          <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>Explore</span></a>
-          <a href="#" class="nav-item"><i class="fa-solid fa-heart"></i><span>Mom Circle</span></a>
-          <a href="#" class="nav-item"><i class="fa-solid fa-baby"></i><span>Baby Milestones</span></a>
-          <a href="#" class="nav-item"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
-          <a href="#" class="nav-item"><i class="fa-solid fa-envelope"></i><span>Messages</span></a>
-          <a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="logo"><span>🍼</span> MAMASPACE</div>
+      <div class="nav">
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>Explore</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-heart"></i><span>Mom Circle</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-baby"></i><span>Baby Milestones</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-envelope"></i><span>Messages</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+      </div>
+      <button class="share-btn"><i class="fa-solid fa-feather-pointed"></i> Share Moment</button>
+    </div>
+
+    <!-- MAIN FEED -->
+    <div class="main">
+      <div class="header">
+        <h1>Home Feed</h1>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div id="userInfo" style="text-align:right; font-size:14px; color:#666;"></div>
+          <div class="avatar">👩‍🍼</div>
         </div>
-        <button class="share-btn"><i class="fa-solid fa-feather-pointed"></i> Share Moment</button>
       </div>
 
-      <!-- MAIN -->
-      <div class="main">
-        <div class="header">
-          <h1>Home Feed</h1>
-          <div style="display:flex; align-items:center; gap:12px;">
-            <input type="text" placeholder="Search mom tips..." style="padding:10px 16px; border-radius:9999px; border:1px solid #ffc2e0; width:280px;">
-            <div class="avatar">👩‍🍼</div>
-          </div>
+      <!-- COMPOSE -->
+      <div class="compose">
+        <div class="compose-top">
+          <div class="avatar">👩‍🍼</div>
+          <textarea class="compose-input" placeholder="What's on your mind, mama? 💕"></textarea>
         </div>
-
-        <!-- COMPOSE -->
-        <div class="compose">
-          <div class="compose-top">
-            <div class="avatar">👩‍🍼</div>
-            <textarea class="compose-input" placeholder="What's on your mind, mama? 💕"></textarea>
+        <div class="compose-actions">
+          <div class="compose-icons">
+            <i id="imageIcon" class="fa-solid fa-image"></i>
+            <i class="fa-solid fa-heart"></i>
+            <i class="fa-solid fa-baby"></i>
           </div>
-          <div class="compose-actions">
-            <div class="compose-icons">
-              <i id="image-upload-icon" class="fa-solid fa-image"></i>
-              <i class="fa-solid fa-heart"></i>
-              <i class="fa-solid fa-baby"></i>
-            </div>
-            <button class="post-btn">Post to Mamaspace</button>
-          </div>
+          <button class="post-btn">Post to Mamaspace</button>
         </div>
-
-        <div id="posts-container"></div>
       </div>
+
+      <div id="postsContainer"></div>
     </div>
   </div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  updateDoc,
-  doc,
-  arrayUnion,
-  increment
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { 
+  getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, 
+  arrayUnion, increment, query, orderBy 
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
+import { 
+  getStorage, ref, uploadBytes, getDownloadURL 
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -192,15 +205,18 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
+let currentUser = null;
+let selectedFile = null;
+
 const postBtn = document.querySelector(".post-btn");
 const textarea = document.querySelector(".compose-input");
-const postsContainer = document.getElementById("posts-container");
-const imageIcon = document.getElementById("image-upload-icon");
-
-let selectedFile = null;
+const postsContainer = document.getElementById("postsContainer");
+const imageIcon = document.getElementById("imageIcon");
+const userInfo = document.getElementById("userInfo");
 
 const fileInput = document.createElement("input");
 fileInput.type = "file";
@@ -210,42 +226,45 @@ imageIcon.addEventListener("click", () => fileInput.click());
 
 fileInput.addEventListener("change", (e) => {
   selectedFile = e.target.files[0];
-  if (selectedFile) alert(`Image selected: ${selectedFile.name}`);
+  if (selectedFile) alert(`Selected: ${selectedFile.name}`);
 });
 
+// Auth
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    const username = user.email.split("@")[0];
+    userInfo.innerHTML = `Welcome back, <b>@${username}</b>`;
+  } else {
+    alert("Please login first");
+    window.location.href = "login.html";
+  }
+});
 
-// POST
+// Post
 postBtn.addEventListener("click", async () => {
+  if (!currentUser) return alert("Please login first");
 
   const text = textarea.value.trim();
-
-  if (!text && !selectedFile) {
-    return alert("Write something or add a photo 💕");
-  }
+  if (!text && !selectedFile) return alert("Write something or add a photo 💕");
 
   try {
-
     let imageUrl = "";
-
     if (selectedFile) {
-      const storageRef = ref(
-        storage,
-        'posts/' + Date.now() + '_' + selectedFile.name
-      );
-
+      const storageRef = ref(storage, 'posts/' + Date.now() + '_' + selectedFile.name);
       await uploadBytes(storageRef, selectedFile);
       imageUrl = await getDownloadURL(storageRef);
     }
 
+    const username = currentUser.email.split("@")[0];
+
     await addDoc(collection(db, "posts"), {
-      user: "Mama User",
-      username: "@mama",
+      user: username,
+      username: "@" + username,
+      email: currentUser.email,
       avatar: "👩‍🍼",
-
-      content: text,   // ✅ FIXED (this was missing)
-
+      content: text,
       imageUrl: imageUrl,
-
       likes: 0,
       comments: [],
       createdAt: Date.now()
@@ -253,88 +272,90 @@ postBtn.addEventListener("click", async () => {
 
     textarea.value = "";
     selectedFile = null;
-
     alert("Posted successfully 💕");
-
   } catch (err) {
     console.error(err);
-    alert("Failed to post.");
+    alert("Failed to post");
   }
-
 });
 
-
-// REALTIME POSTS
-onSnapshot(collection(db, "posts"), (snapshot) => {
-
+// Load Posts
+const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+onSnapshot(q, (snapshot) => {
   postsContainer.innerHTML = "";
 
   snapshot.forEach((docSnap) => {
-
     const post = docSnap.data();
     const postId = docSnap.id;
 
     const postHTML = `
       <div class="post">
-
         <div class="post-header">
           <div class="avatar">${post.avatar || "👩‍🍼"}</div>
           <div>
             <div class="post-user">${post.user}</div>
-            <div style="color:#888;">${post.username}</div>
+            <div style="color:#888; font-size:14px;">${post.username}</div>
           </div>
         </div>
 
-        <div class="post-content">${post.content}</div>
-
-        ${post.imageUrl ? `
-          <img src="${post.imageUrl}" class="post-image">
-        ` : ''}
+        <div class="post-content">${post.content || ""}</div>
+        ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image">` : ''}
 
         <div class="post-footer">
-
-          <div class="action-btn like-btn" data-id="${postId}">
-            ❤️ ${post.likes || 0}
-          </div>
-
-          <div class="action-btn comment-btn" data-id="${postId}">
-            💬 ${(post.comments || []).length}
-          </div>
-
+          <div class="action-btn like-btn" data-id="${postId}">❤️ ${post.likes || 0}</div>
+          <div class="action-btn comment-btn" data-id="${postId}">💬 ${(post.comments || []).length}</div>
         </div>
 
+        <div class="comment-section" id="comments-${postId}">
+          ${(post.comments || []).map(c => `<div class="comment">${c}</div>`).join('')}
+          <div class="comment-input">
+            <input type="text" placeholder="Write a comment..." class="comment-text">
+            <button class="send-comment" data-id="${postId}">Send</button>
+          </div>
+        </div>
       </div>
     `;
-
     postsContainer.innerHTML += postHTML;
-
   });
 
   attachEvents();
-
 });
 
-
-// EVENTS
 function attachEvents() {
-
+  // Like
   document.querySelectorAll(".like-btn").forEach(btn => {
-
     btn.addEventListener("click", async () => {
-
-      const postId = btn.dataset.id;
-      const postRef = doc(db, "posts", postId);
-
-      await updateDoc(postRef, {
-        likes: increment(1)   // ✅ REAL FIREBASE INCREMENT
-      });
-
+      const postRef = doc(db, "posts", btn.dataset.id);
+      await updateDoc(postRef, { likes: increment(1) });
     });
-
   });
 
-}
+  // Toggle Comments
+  document.querySelectorAll(".comment-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const section = document.getElementById(`comments-${btn.dataset.id}`);
+      section.style.display = section.style.display === "block" ? "none" : "block";
+    });
+  });
 
+  // Send Comment
+  document.querySelectorAll(".send-comment").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const input = btn.previousElementSibling;
+      const text = input.value.trim();
+      if (!text || !currentUser) return;
+
+      const username = currentUser.email.split("@")[0];
+      const postRef = doc(db, "posts", btn.dataset.id);
+
+      await updateDoc(postRef, {
+        comments: arrayUnion(`@${username}: ${text}`)
+      });
+
+      input.value = "";
+    });
+  });
+}
 </script>
 </body>
 </html>
