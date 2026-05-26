@@ -6,13 +6,8 @@
   <title>Welcome Back • Mamaspace</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  <style>
-    .gradient-bg {
-      background: linear-gradient(135deg, #f8fafc 0%, #f3e8ff 100%);
-    }
-  </style>
 </head>
-<body class="gradient-bg min-h-screen flex items-center justify-center relative overflow-hidden">
+<body class="bg-gradient-to-br from-pink-50 via-purple-50 to-white min-h-screen flex items-center justify-center relative overflow-hidden">
 
   <!-- Background Glows -->
   <div class="fixed inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(236,72,153,0.25),transparent)]"></div>
@@ -50,10 +45,25 @@
           </div>
         </div>
 
+        <div class="flex items-center justify-between text-sm">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="rememberMe" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+            <span class="text-gray-600">Remember me</span>
+          </label>
+          <a href="#" id="forgotPassword" class="text-pink-500 hover:underline font-medium">Forgot Password?</a>
+        </div>
+
         <button type="submit" id="submitBtn"
                 class="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold py-4 rounded-2xl text-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-70">
           <span id="btnText">Sign In</span>
           <i id="btnIcon" class="fa-solid fa-right-to-bracket"></i>
+        </button>
+
+        <!-- Google Sign In -->
+        <button type="button" id="googleBtn"
+                class="w-full border border-gray-300 hover:bg-gray-50 py-4 rounded-2xl font-semibold flex items-center justify-center gap-3 transition-colors">
+          <i id="googleIcon" class="fa-brands fa-google text-red-500"></i>
+          <span id="googleText">Continue with Google</span>
         </button>
 
         <p class="text-center text-sm text-gray-600">
@@ -64,9 +74,19 @@
     </div>
   </div>
 
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      signInWithPopup, 
+      GoogleAuthProvider,
+      sendPasswordResetEmail,
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
@@ -74,13 +94,12 @@
       projectId: "mamaspace-bf004",
       storageBucket: "mamaspace-bf004.firebasestorage.app",
       messagingSenderId: "520083469560",
-      appId: "1:520083469560:web:d83cec2ce32ba0fa1bf70d",
-      measurementId: "G-HFLW3BTN9E"
+      appId: "1:520083469560:web:d83cec2ce32ba0fa1bf70d"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
 
     // DOM Elements
     const form = document.getElementById('signinForm');
@@ -89,18 +108,128 @@
     const btnIcon = document.getElementById('btnIcon');
     const passwordInput = document.getElementById('password');
     const togglePasswordBtn = document.getElementById('togglePassword');
+    const googleBtn = document.getElementById('googleBtn');
+    const googleIcon = document.getElementById('googleIcon');
+    const googleText = document.getElementById('googleText');
+    const rememberMe = document.getElementById('rememberMe');
+    const forgotPasswordLink = document.getElementById('forgotPassword');
 
-    // Password visibility toggle
+    // Toast Function
+    function showToast(message, type = 'error') {
+      const toast = document.createElement('div');
+      toast.className = `px-5 py-4 rounded-2xl shadow-xl text-white flex items-center gap-3 max-w-xs ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+      }`;
+      toast.innerHTML = `
+        <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-circle-xmark'}"></i>
+        <span>${message}</span>
+      `;
+      document.getElementById('toastContainer').appendChild(toast);
+
+      setTimeout(() => toast.remove(), 4500);
+    }
+
+    // Password Toggle
     togglePasswordBtn.addEventListener('click', () => {
-      const isPassword = passwordInput.type === 'password';
-      passwordInput.type = isPassword ? 'text' : 'password';
-      
-      togglePasswordBtn.innerHTML = isPassword 
+      const isHidden = passwordInput.type === 'password';
+      passwordInput.type = isHidden ? 'text' : 'password';
+      togglePasswordBtn.innerHTML = isHidden 
         ? '<i class="fa-solid fa-eye-slash"></i>' 
         : '<i class="fa-solid fa-eye"></i>';
     });
 
+    // Check if user is already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "home.html";
+      }
+    });
+
+    // Remember Me
+    window.addEventListener('load', () => {
+      const savedEmail = localStorage.getItem('mamaspace_email');
+      if (savedEmail) {
+        document.getElementById('email').value = savedEmail;
+        rememberMe.checked = true;
+      }
+    });
+
+    // Email & Password Sign In
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const email = document.getElementById('email').value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showToast("Please fill in all fields", "error");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      btnText.textContent = "Signing in...";
+      btnIcon.classList.add('fa-spinner', 'fa-spin');
+      btnIcon.classList.remove('fa-right-to-bracket');
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+
+        if (rememberMe.checked) {
+          localStorage.setItem('mamaspace_email', email);
+        } else {
+          localStorage.removeItem('mamaspace_email');
+        }
+
+        showToast("Welcome back! 🎉", "success");
+        setTimeout(() => window.location.href = "home.html", 900);
+      } catch (error) {
+        let msg = "Invalid email or password";
+        if (error.code === 'auth/too-many-requests') msg = "Too many attempts. Please try later.";
+        if (error.code === 'auth/invalid-email') msg = "Please enter a valid email.";
+        showToast(msg);
+      } finally {
+        submitBtn.disabled = false;
+        btnText.textContent = "Sign In";
+        btnIcon.classList.remove('fa-spinner', 'fa-spin');
+        btnIcon.classList.add('fa-right-to-bracket');
+      }
+    });
+
+    // Google Sign In
+    googleBtn.addEventListener('click', async () => {
+      googleBtn.disabled = true;
+      googleIcon.classList.add('fa-spinner', 'fa-spin');
+      googleText.textContent = "Connecting...";
+
+      try {
+        await signInWithPopup(auth, googleProvider);
+        showToast("Successfully signed in with Google!", "success");
+        setTimeout(() => window.location.href = "home.html", 900);
+      } catch (error) {
+        showToast("Google sign-in was cancelled or failed.");
+      } finally {
+        googleBtn.disabled = false;
+        googleIcon.classList.remove('fa-spinner', 'fa-spin');
+        googleText.textContent = "Continue with Google";
+      }
+    });
+
+    // Real Forgot Password
+    forgotPasswordLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+
+      if (!email) {
+        showToast("Please enter your email address first", "error");
+        return;
+      }
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        showToast("Password reset link has been sent to your email!", "success");
+      } catch (error) {
+        showToast("Failed to send reset email. Please check your email address.");
+      }
+    });
+  </script>
+</body>
+</html>
