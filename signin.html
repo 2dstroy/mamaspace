@@ -65,42 +65,83 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
-      authDomain: "mamaspace-bf004.firebaseapp.com",
-      projectId: "mamaspace-bf004",
-      storageBucket: "mamaspace-bf004.firebasestorage.app",
-      messagingSenderId: "520083469560",
-      appId: "1:520083469560:web:d83cec2ce32ba0fa1bf70d",
-      measurementId: "G-HFLW3BTN9E"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
+    authDomain: "mamaspace-bf004.firebaseapp.com",
+    projectId: "mamaspace-bf004",
+    storageBucket: "mamaspace-bf004.firebasestorage.app",
+    messagingSenderId: "520083469560",
+    appId: "1:520083469560:web:d83cec2ce32ba0fa1bf70d",
+    measurementId: "G-HFLW3BTN9E"
+  };
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    // DOM Elements
-    const form = document.getElementById('signinForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const btnText = document.getElementById('btnText');
-    const btnIcon = document.getElementById('btnIcon');
-    const passwordInput = document.getElementById('password');
-    const togglePasswordBtn = document.getElementById('togglePassword');
+  // DOM Elements
+  const form = document.getElementById('signinForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const btnText = document.getElementById('btnText');
+  const btnIcon = document.getElementById('btnIcon');
+  const passwordInput = document.getElementById('password');
+  const togglePasswordBtn = document.getElementById('togglePassword');
 
-    // Password visibility toggle
-    togglePasswordBtn.addEventListener('click', () => {
-      const isPassword = passwordInput.type === 'password';
-      passwordInput.type = isPassword ? 'text' : 'password';
+  // Toggle password visibility
+  togglePasswordBtn.addEventListener('click', () => {
+    const isPassword = passwordInput.type === 'password';
+    passwordInput.type = isPassword ? 'text' : 'password';
+    togglePasswordBtn.innerHTML = isPassword 
+      ? '<i class="fa-solid fa-eye-slash"></i>' 
+      : '<i class="fa-solid fa-eye"></i>';
+  });
+
+  // Sign in handler
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+      alert("Please fill in both email and password");
+      return;
+    }
+
+    // Loading state
+    submitBtn.disabled = true;
+    btnText.textContent = "Signing in...";
+    btnIcon.classList.add('fa-spinner', 'fa-spin');
+    btnIcon.classList.remove('fa-right-to-bracket');
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Signed in successfully:", userCredential.user);
+
+      // Redirect to home
+      window.location.href = "home.html";
+
+    } catch (error) {
+      console.error("Sign in error:", error.code, error.message);
       
-      togglePasswordBtn.innerHTML = isPassword 
-        ? '<i class="fa-solid fa-eye-slash"></i>' 
-        : '<i class="fa-solid fa-eye"></i>';
-    });
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const email = document.getElementById('email').value.trim();
+      let message = "Invalid email or password";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        message = "Invalid email or password";
+      } else if (error.code === 'auth/too-many-requests') {
+        message = "Too many attempts. Try again later.";
+      } else if (error.code === 'auth/invalid-email') {
+        message = "Please enter a valid email address.";
+      }
+      
+      alert(message);
+    } finally {
+      // Reset button
+      submitBtn.disabled = false;
+      btnText.textContent = "Sign In";
+      btnIcon.classList.remove('fa-spinner', 'fa-spin');
+      btnIcon.classList.add('fa-right-to-bracket');
+    }
+  });
+</script>
