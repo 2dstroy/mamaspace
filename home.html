@@ -161,17 +161,34 @@
   </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-import { 
-  getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, arrayUnion 
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  updateDoc,
+  doc,
+  arrayUnion,
+  increment
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-import { 
-  getStorage, ref, uploadBytes, getDownloadURL 
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
 
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+
 const firebaseConfig = {
-  apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
+  apiKey: "YOUR_API_KEY",
   authDomain: "mamaspace-bf004.firebaseapp.com",
   projectId: "mamaspace-bf004",
   storageBucket: "mamaspace-bf004.firebasestorage.app",
@@ -180,163 +197,348 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
+
 const storage = getStorage(app);
 
+const auth = getAuth(app);
+
 const postBtn = document.querySelector(".post-btn");
+
 const textarea = document.querySelector(".compose-input");
+
 const postsContainer = document.getElementById("posts-container");
+
 const imageIcon = document.getElementById("image-upload-icon");
 
+
+// CURRENT USER
+let currentUser = null;
+
+
+// CHECK LOGIN
+onAuthStateChanged(auth, (user) => {
+
+  if(user){
+
+    currentUser = user;
+
+    console.log("Logged in:", user.email);
+
+  }else{
+
+    alert("Please login first");
+
+    window.location.href = "login.html";
+
+  }
+
+});
+
+
+// IMAGE
 let selectedFile = null;
+
 const fileInput = document.createElement("input");
+
 fileInput.type = "file";
+
 fileInput.accept = "image/*";
 
 imageIcon.addEventListener("click", () => fileInput.click());
 
 fileInput.addEventListener("change", (e) => {
+
   selectedFile = e.target.files[0];
-  if (selectedFile) alert(`Image selected: ${selectedFile.name}`);
+
+  if(selectedFile){
+
+    alert(`Image selected: ${selectedFile.name}`);
+
+  }
+
 });
 
-// Post
-postBtn.addEventListener("click", async () => {
-  const text = textarea.value.trim();
-  if (!text && !selectedFile) return alert("Write something or add a photo 💕");
 
-  let imageUrl = "";
-  try {
-    if (selectedFile) {
-      const storageRef = ref(storage, 'posts/' + Date.now() + '_' + selectedFile.name);
+// POST
+postBtn.addEventListener("click", async () => {
+
+  const text = textarea.value.trim();
+
+  if(!text && !selectedFile){
+
+    return alert("Write something or add photo 💕");
+
+  }
+
+  try{
+
+    let imageUrl = "";
+
+    // UPLOAD IMAGE
+    if(selectedFile){
+
+      const storageRef = ref(
+        storage,
+        'posts/' + Date.now() + '_' + selectedFile.name
+      );
+
       await uploadBytes(storageRef, selectedFile);
+
       imageUrl = await getDownloadURL(storageRef);
+
     }
 
+    // USERNAME FROM EMAIL
+    const username =
+      currentUser.displayName ||
+      currentUser.email.split("@")[0];
+
+    // SAVE POST
     await addDoc(collection(db, "posts"), {
-      user: "Mama User",
-      username: "@mama",
+
+      user: username,
+
+      username: "@" + currentUser.email.split("@")[0],
+
       avatar: "👩‍🍼",
+
+      email: currentUser.email,
+
       content: text || "",
+
       imageUrl: imageUrl,
+
       likes: 0,
+
       comments: [],
+
       createdAt: Date.now()
+
     });
 
     textarea.value = "";
+
     selectedFile = null;
-    alert("Posted successfully! 💕");
-  } catch (err) {
+
+    alert("Posted successfully 💕");
+
+  }catch(err){
+
     console.error(err);
-    alert("Failed to post.");
+
+    alert("Failed to post");
+
   }
+
 });
 
-// Realtime Posts
+
+// REALTIME POSTS
 onSnapshot(collection(db, "posts"), (snapshot) => {
+
   postsContainer.innerHTML = "";
 
   snapshot.forEach((docSnap) => {
+
     const post = docSnap.data();
+
     const postId = docSnap.id;
 
     const postHTML = `
+
       <div class="post" data-id="${postId}">
+
         <div class="post-header">
-          <div class="avatar">${post.avatar || "👩‍🍼"}</div>
-          <div>
-            <div class="post-user">${post.user || "Mama"}</div>
-            <div style="color:#888;">${post.username || "@mama"}</div>
+
+          <div class="avatar">
+            ${post.avatar || "👩‍🍼"}
           </div>
+
+          <div>
+
+            <div class="post-user">
+              ${post.user || "Mama"}
+            </div>
+
+            <div style="color:#888;">
+              ${post.username || "@mama"}
+            </div>
+
+          </div>
+
         </div>
 
-        <div class="post-content">${post.content}</div>
-        ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Post image">` : ''}
+        <div class="post-content">
+          ${post.content || ""}
+        </div>
+
+        ${
+          post.imageUrl
+          ?
+          `<img src="${post.imageUrl}" class="post-image">`
+          :
+          ""
+        }
 
         <div class="post-footer">
+
           <div class="action-btn like-btn" data-id="${postId}">
-            <i class="fa-solid fa-heart"></i> <span class="like-count">${post.likes || 0}</span>
+            <i class="fa-solid fa-heart"></i>
+            <span>${post.likes || 0}</span>
           </div>
+
           <div class="action-btn comment-btn" data-id="${postId}">
-            <i class="fa-solid fa-comment"></i> <span>${(post.comments || []).length}</span>
+            <i class="fa-solid fa-comment"></i>
+            <span>${(post.comments || []).length}</span>
           </div>
+
         </div>
 
         <div class="comments-section" id="comments-${postId}">
+
           ${(post.comments || []).map(c => `
+
             <div class="comment">
-              <strong>@mama:</strong> ${c}
+
+              <strong>${c.user}:</strong> ${c.text}
+
             </div>
+
           `).join('')}
 
           <div class="comment-input">
-            <input type="text" placeholder="Write a comment..." class="comment-input-field">
-            <button class="post-comment-btn" data-id="${postId}">Send</button>
+
+            <input
+              type="text"
+              placeholder="Write a comment..."
+              class="comment-input-field"
+            >
+
+            <button
+              class="post-comment-btn"
+              data-id="${postId}"
+            >
+              Send
+            </button>
+
           </div>
+
         </div>
+
       </div>
+
     `;
 
     postsContainer.innerHTML += postHTML;
+
   });
 
-  // Attach event listeners after rendering
   attachEventListeners();
+
 });
 
-function attachEventListeners() {
-  // Like buttons
+
+// EVENTS
+function attachEventListeners(){
+
+  // LIKE
   document.querySelectorAll('.like-btn').forEach(btn => {
+
     btn.addEventListener('click', async () => {
+
       const postId = btn.dataset.id;
+
       const postRef = doc(db, "posts", postId);
 
-      try {
-        await updateDoc(postRef, { likes: increment(1) }); // You can also use FieldValue.increment if imported
-        // For simplicity we'll just refresh via snapshot
-      } catch(e) { console.error(e); }
+      try{
+
+        await updateDoc(postRef, {
+
+          likes: increment(1)
+
+        });
+
+      }catch(e){
+
+        console.error(e);
+
+      }
+
     });
+
   });
 
-  // Comment toggle
+
+  // COMMENT TOGGLE
   document.querySelectorAll('.comment-btn').forEach(btn => {
+
     btn.addEventListener('click', () => {
+
       const postId = btn.dataset.id;
-      const commentsSection = document.getElementById(`comments-${postId}`);
-      commentsSection.style.display = commentsSection.style.display === 'block' ? 'none' : 'block';
+
+      const commentsSection =
+        document.getElementById(`comments-${postId}`);
+
+      commentsSection.style.display =
+        commentsSection.style.display === 'block'
+        ? 'none'
+        : 'block';
+
     });
+
   });
 
-  // Post comment
+
+  // SEND COMMENT
   document.querySelectorAll('.post-comment-btn').forEach(btn => {
+
     btn.addEventListener('click', async () => {
+
       const postId = btn.dataset.id;
+
       const input = btn.previousElementSibling;
+
       const text = input.value.trim();
 
-      if (!text) return;
+      if(!text) return;
 
-      const postRef = doc(db, "posts", postId);
-      try {
+      const username =
+        currentUser.displayName ||
+        currentUser.email.split("@")[0];
+
+      const postRef =
+        doc(db, "posts", postId);
+
+      try{
+
         await updateDoc(postRef, {
-          comments: arrayUnion(text)
+
+          comments: arrayUnion({
+
+            user: username,
+
+            text: text
+
+          })
+
         });
+
         input.value = "";
-      } catch(e) {
+
+      }catch(e){
+
         console.error(e);
+
       }
+
     });
+
   });
+
 }
 
-// Simple increment helper (since we didn't import FieldValue)
-function increment(n) {
-  // This is just a placeholder — better to use:
-  // import { increment } from "firebase/firestore";
-  // then: likes: increment(1)
-  return (current) => (current || 0) + n;
-}
 </script>
 </body>
 </html>
