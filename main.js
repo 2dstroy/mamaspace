@@ -1,32 +1,16 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  updateDoc,
-  doc,
-  arrayUnion,
-  increment,
-  query,
-  orderBy
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { 
+  getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, 
+  arrayUnion, increment, query, orderBy 
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
+import { 
+  getStorage, ref, uploadBytes, getDownloadURL 
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
+  apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
   authDomain: "mamaspace-bf004.firebaseapp.com",
   projectId: "mamaspace-bf004",
   storageBucket: "mamaspace-bf004.firebasestorage.app",
@@ -35,7 +19,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -43,410 +26,227 @@ const storage = getStorage(app);
 let currentUser = null;
 let selectedFile = null;
 
-/* =========================
-   HOME PAGE ELEMENTS
-========================= */
-
 const postBtn = document.querySelector(".post-btn");
 const textarea = document.querySelector(".compose-input");
 const postsContainer = document.getElementById("postsContainer");
 const imageIcon = document.getElementById("imageIcon");
 const userInfo = document.getElementById("userInfo");
 
-/* =========================
-   PROFILE PAGE ELEMENTS
-========================= */
-
-const profileName = document.getElementById("profileName");
-const profileUsername = document.getElementById("profileUsername");
-const profileBio = document.getElementById("profileBio");
-const profileImage = document.getElementById("profileImage");
-const profileEmoji = document.getElementById("profileEmoji");
-
-/* =========================
-   FILE INPUT
-========================= */
-
 const fileInput = document.createElement("input");
-
 fileInput.type = "file";
 fileInput.accept = "image/*";
 
-if (imageIcon) {
-
-  imageIcon.addEventListener("click", () => {
-    fileInput.click();
-  });
-
-}
+imageIcon.addEventListener("click", () => fileInput.click());
 
 fileInput.addEventListener("change", (e) => {
-
   selectedFile = e.target.files[0];
-
   if (selectedFile) {
     alert(`Selected: ${selectedFile.name}`);
   }
-
 });
 
-/* =========================
-   AUTH
-========================= */
+// AUTH
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
 
-onAuthStateChanged(auth, async (user) => {
+    const username = user.email.split("@")[0];
 
-  if (!user) {
-
+    userInfo.innerHTML = `Welcome back, <b>@${username}</b>`;
+  } else {
     alert("Please login first");
     window.location.href = "login.html";
-    return;
-
   }
-
-  currentUser = user;
-
-  const username = user.email.split("@")[0];
-
-  /* HOME PAGE USER INFO */
-
-  if (userInfo) {
-
-    userInfo.innerHTML = `
-      Welcome back, <b>@${username}</b>
-    `;
-
-  }
-
-  /* PROFILE PAGE USER INFO */
-
-  if (profileName) {
-
-    profileName.textContent = username;
-
-  }
-
-  if (profileUsername) {
-
-    profileUsername.textContent = "@" + username;
-
-  }
-
-  if (profileBio) {
-
-    profileBio.textContent =
-      "Welcome to Mamaspace 💕";
-
-  }
-
-  /* PROFILE PHOTO */
-
-  if (profileImage) {
-
-    if (user.photoURL) {
-
-      profileImage.src = user.photoURL;
-
-      profileImage.style.display = "block";
-
-      if (profileEmoji) {
-        profileEmoji.style.display = "none";
-      }
-
-    } else {
-
-      profileImage.style.display = "none";
-
-      if (profileEmoji) {
-        profileEmoji.style.display = "block";
-      }
-
-    }
-
-  }
-
 });
 
-/* =========================
-   CREATE POST
-========================= */
+// CREATE POST
+postBtn.addEventListener("click", async () => {
+  if (!currentUser) return;
 
-if (postBtn) {
+  const text = textarea.value.trim();
 
-  postBtn.addEventListener("click", async () => {
+  if (!text && !selectedFile) {
+    return alert("Write something or add a photo 💕");
+  }
 
-    if (!currentUser) return;
+  try {
+    let imageUrl = "";
 
-    const text = textarea.value.trim();
+    if (selectedFile) {
+      const storageRef = ref(
+        storage,
+        "posts/" + Date.now() + "_" + selectedFile.name
+      );
 
-    if (!text && !selectedFile) {
+      await uploadBytes(storageRef, selectedFile);
 
-      alert("Write something or add a photo 💕");
-      return;
-
+      imageUrl = await getDownloadURL(storageRef);
     }
 
-    try {
+    const username = currentUser.email.split("@")[0];
 
-      let imageUrl = "";
+    await addDoc(collection(db, "posts"), {
+      user: username,
+      username: "@" + username,
+      email: currentUser.email,
+      avatar: "👩‍🍼",
+      content: text,
+      imageUrl: imageUrl,
+      likes: 0,
+      comments: [],
+      createdAt: Date.now()
+    });
 
-      if (selectedFile) {
+    textarea.value = "";
+    selectedFile = null;
 
-        const storageRef = ref(
-          storage,
-          "posts/" +
-          Date.now() +
-          "_" +
-          selectedFile.name
-        );
+    alert("Posted successfully 💕");
 
-        await uploadBytes(storageRef, selectedFile);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to post");
+  }
+});
 
-        imageUrl = await getDownloadURL(storageRef);
+// LOAD POSTS
+const q = query(
+  collection(db, "posts"),
+  orderBy("createdAt", "desc")
+);
 
-      }
+onSnapshot(q, (snapshot) => {
+  postsContainer.innerHTML = "";
 
-      const username =
-        currentUser.email.split("@")[0];
+  snapshot.forEach((docSnap) => {
 
-      await addDoc(collection(db, "posts"), {
+    const post = docSnap.data();
+    const postId = docSnap.id;
 
-        user: username,
-        username: "@" + username,
-        email: currentUser.email,
+    const postHTML = `
+      <div class="post">
 
-        avatar:
-          currentUser.photoURL ||
-          "👩‍🍼",
+        <div class="post-header">
+          <div class="avatar">${post.avatar || "👩‍🍼"}</div>
 
-        content: text,
-
-        imageUrl: imageUrl,
-
-        likes: 0,
-
-        comments: [],
-
-        createdAt: Date.now()
-
-      });
-
-      textarea.value = "";
-
-      selectedFile = null;
-
-      alert("Posted successfully 💕");
-
-    } catch (err) {
-
-      console.error(err);
-
-      alert("Failed to post");
-
-    }
-
-  });
-
-}
-
-/* =========================
-   LOAD POSTS
-========================= */
-
-if (postsContainer) {
-
-  const q = query(
-    collection(db, "posts"),
-    orderBy("createdAt", "desc")
-  );
-
-  onSnapshot(q, (snapshot) => {
-
-    postsContainer.innerHTML = "";
-
-    snapshot.forEach((docSnap) => {
-
-      const post = docSnap.data();
-
-      const postId = docSnap.id;
-
-      const avatarHTML =
-        post.avatar &&
-        post.avatar.startsWith("http")
-
-          ? `<img src="${post.avatar}" class="avatar-img">`
-
-          : `${post.avatar || "👩‍🍼"}`;
-
-      const postHTML = `
-
-        <div class="post">
-
-          <div class="post-header">
-
-            <div class="avatar">
-              ${avatarHTML}
+          <div>
+            <div class="post-user">${post.user}</div>
+            <div style="color:#888;font-size:14px;">
+              ${post.username}
             </div>
+          </div>
+        </div>
 
-            <div>
+        <div class="post-content">
+          ${post.content || ""}
+        </div>
 
-              <div class="post-user">
-                ${post.user}
-              </div>
+        ${post.imageUrl ? `
+          <img src="${post.imageUrl}" class="post-image">
+        ` : ""}
 
-              <div style="color:#888;font-size:14px;">
-                ${post.username}
-              </div>
-
-            </div>
-
+        <div class="post-footer">
+          <div class="action-btn like-btn" data-id="${postId}">
+            ❤️ ${post.likes || 0}
           </div>
 
-          <div class="post-content">
-            ${post.content || ""}
+          <div class="action-btn comment-btn" data-id="${postId}">
+            💬 ${(post.comments || []).length}
           </div>
+        </div>
 
-          ${post.imageUrl ? `
-            <img src="${post.imageUrl}" class="post-image">
-          ` : ""}
+        <div class="comment-section" id="comments-${postId}">
 
-          <div class="post-footer">
+          ${(post.comments || [])
+            .map(c => `<div class="comment">${c}</div>`)
+            .join("")}
 
-            <div class="action-btn like-btn" data-id="${postId}">
-              ❤️ ${post.likes || 0}
-            </div>
+          <div class="comment-input">
+            <input 
+              type="text"
+              placeholder="Write a comment..."
+              class="comment-text"
+            >
 
-            <div class="action-btn comment-btn" data-id="${postId}">
-              💬 ${(post.comments || []).length}
-            </div>
-
-          </div>
-
-          <div class="comment-section" id="comments-${postId}">
-
-            ${(post.comments || [])
-              .map(c => `
-                <div class="comment">${c}</div>
-              `)
-              .join("")}
-
-            <div class="comment-input">
-
-              <input
-                type="text"
-                placeholder="Write a comment..."
-                class="comment-text"
-              >
-
-              <button
-                class="send-comment"
-                data-id="${postId}"
-              >
-                Send
-              </button>
-
-            </div>
-
+            <button class="send-comment" data-id="${postId}">
+              Send
+            </button>
           </div>
 
         </div>
 
-      `;
+      </div>
+    `;
 
-      postsContainer.innerHTML += postHTML;
+    postsContainer.innerHTML += postHTML;
+  });
+
+  attachEvents();
+});
+
+// EVENTS
+function attachEvents() {
+
+  // LIKE
+  document.querySelectorAll(".like-btn").forEach(btn => {
+
+    btn.addEventListener("click", async () => {
+
+      const postRef = doc(db, "posts", btn.dataset.id);
+
+      await updateDoc(postRef, {
+        likes: increment(1)
+      });
 
     });
-
-    attachEvents();
 
   });
 
-}
+  // TOGGLE COMMENTS
+  document.querySelectorAll(".comment-btn").forEach(btn => {
 
-/* =========================
-   EVENTS
-========================= */
+    btn.addEventListener("click", () => {
 
-function attachEvents() {
+      const section = document.getElementById(
+        `comments-${btn.dataset.id}`
+      );
 
-  /* LIKE */
-
-  document.querySelectorAll(".like-btn")
-    .forEach(btn => {
-
-      btn.addEventListener("click", async () => {
-
-        const postRef = doc(
-          db,
-          "posts",
-          btn.dataset.id
-        );
-
-        await updateDoc(postRef, {
-          likes: increment(1)
-        });
-
-      });
+      section.style.display =
+        section.style.display === "block"
+          ? "none"
+          : "block";
 
     });
 
-  /* TOGGLE COMMENTS */
+  });
 
-  document.querySelectorAll(".comment-btn")
-    .forEach(btn => {
+  // SEND COMMENT
+  document.querySelectorAll(".send-comment").forEach(btn => {
 
-      btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
 
-        const section =
-          document.getElementById(
-            `comments-${btn.dataset.id}`
-          );
+      const input = btn.previousElementSibling;
 
-        section.style.display =
-          section.style.display === "block"
-            ? "none"
-            : "block";
+      const text = input.value.trim();
 
+      if (!text || !currentUser) return;
+
+      const username =
+        currentUser.email.split("@")[0];
+
+      const postRef = doc(
+        db,
+        "posts",
+        btn.dataset.id
+      );
+
+      await updateDoc(postRef, {
+        comments: arrayUnion(`@${username}: ${text}`)
       });
+
+      input.value = "";
 
     });
 
-  /* SEND COMMENT */
-
-  document.querySelectorAll(".send-comment")
-    .forEach(btn => {
-
-      btn.addEventListener("click", async () => {
-
-        const input =
-          btn.previousElementSibling;
-
-        const text =
-          input.value.trim();
-
-        if (!text || !currentUser) return;
-
-        const username =
-          currentUser.email.split("@")[0];
-
-        const postRef = doc(
-          db,
-          "posts",
-          btn.dataset.id
-        );
-
-        await updateDoc(postRef, {
-
-          comments: arrayUnion(
-            `@${username}: ${text}`
-          )
-
-        });
-
-        input.value = "";
-
-      });
-
-    });
+  });
 
 }
