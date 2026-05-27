@@ -3,7 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/fireba
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 import { 
   getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, 
-  arrayUnion, increment, query, orderBy, getDoc, setDoc, deleteDoc 
+  arrayUnion, increment, query, orderBy, 
+  getDoc, setDoc, deleteDoc 
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 import { 
   getStorage, ref, uploadBytes, getDownloadURL 
@@ -61,7 +62,6 @@ postBtn.addEventListener("click", async () => {
   if (!currentUser) return;
 
   const text = textarea.value.trim();
-
   if (!text && !selectedFile) {
     return alert("Write something or add a photo 💕");
   }
@@ -91,13 +91,13 @@ postBtn.addEventListener("click", async () => {
 
     textarea.value = "";
     selectedFile = null;
-    fileInput.value = ""; // clear file input
+    fileInput.value = "";
 
     alert("Posted successfully 💕");
 
   } catch (err) {
     console.error(err);
-    alert("Failed to post. Please try again.");
+    alert("Failed to post");
   }
 });
 
@@ -117,15 +117,13 @@ onSnapshot(q, (snapshot) => {
           <div class="avatar">${post.avatar || "👩‍🍼"}</div>
           <div>
             <div class="post-user">${post.user}</div>
-            <div style="color:#888; font-size:14px;">${post.username}</div>
+            <div style="color:#888;font-size:14px;">${post.username}</div>
           </div>
         </div>
 
         <div class="post-content">${post.content || ""}</div>
 
-        ${post.imageUrl ? `
-          <img src="${post.imageUrl}" class="post-image" alt="Post image">
-        ` : ""}
+        ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="post image">` : ""}
 
         <div class="post-footer">
           <div class="action-btn like-btn" data-id="${postId}">
@@ -138,7 +136,6 @@ onSnapshot(q, (snapshot) => {
 
         <div class="comment-section" id="comments-${postId}" style="display:none;">
           ${(post.comments || []).map(c => `<div class="comment">${c}</div>`).join("")}
-          
           <div class="comment-input">
             <input type="text" placeholder="Write a comment..." class="comment-text">
             <button class="send-comment" data-id="${postId}">Send</button>
@@ -151,64 +148,12 @@ onSnapshot(q, (snapshot) => {
   });
 });
 
-// ====================== EVENT DELEGATION ======================
+// ====================== EVENT DELEGATION (LIKE + COMMENT) ======================
 postsContainer.addEventListener("click", async (e) => {
-  const likeBtn = e.target.closest(".like-btn");
-  const commentBtn = e.target.closest(".comment-btn");
-  const sendBtn = e.target.closest(".send-comment");
-
-  // LIKE BUTTON
-  if (likeBtn) {
+  // LIKE
+  if (e.target.closest(".like-btn")) {
+    const likeBtn = e.target.closest(".like-btn");
     const postId = likeBtn.dataset.id;
     const user = auth.currentUser;
-    if (!user) return alert("Please login first!");
 
-    const postRef = doc(db, "posts", postId);
-    const likeRef = doc(db, "posts", postId, "likes", user.uid);
-
-    try {
-      const likeSnap = await getDoc(likeRef);
-
-      if (likeSnap.exists()) {
-        // Unlike
-        await deleteDoc(likeRef);
-        await updateDoc(postRef, { likes: increment(-1) });
-      } else {
-        // Like
-        await setDoc(likeRef, { likedAt: Date.now() });
-        await updateDoc(postRef, { likes: increment(1) });
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error updating like");
-    }
-  }
-
-  // TOGGLE COMMENT SECTION
-  if (commentBtn) {
-    const section = document.getElementById(`comments-${commentBtn.dataset.id}`);
-    section.style.display = section.style.display === "block" ? "none" : "block";
-  }
-
-  // SEND COMMENT
-  if (sendBtn) {
-    const input = sendBtn.previousElementSibling;
-    const text = input.value.trim();
-    if (!text || !currentUser) return;
-
-    const postId = sendBtn.dataset.id;
-    const username = currentUser.email.split("@")[0];
-    const postRef = doc(db, "posts", postId);
-
-    try {
-      await updateDoc(postRef, {
-        comments: arrayUnion(`@${username}: ${text}`)
-      });
-      input.value = "";
-    } catch (err) {
-      console.error(err);
-      alert("Failed to post comment");
-    }
-  }
-});
-</script>
+    if
