@@ -1,12 +1,10 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { auth, db } from "./firebase.js";
 
 import {
-  getAuth,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
 import {
-  getFirestore,
   collection,
   query,
   where,
@@ -14,50 +12,28 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "mamaspace-bf004.firebaseapp.com",
-  projectId: "mamaspace-bf004",
-  storageBucket: "mamaspace-bf004.firebasestorage.app",
-  messagingSenderId: "520083469560",
-  appId: "1:520083469560:web:d83cec2ce32ba0fa1bf70d"
-};
-
-const app = initializeApp(firebaseConfig);
-
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// PROFILE ELEMENTS
 const profileName = document.getElementById("profileName");
 const profileUsername = document.getElementById("profileUsername");
 const profileBio = document.getElementById("profileBio");
-
 const userPosts = document.getElementById("user-posts");
 
-// AUTH
 onAuthStateChanged(auth, (user) => {
 
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
+  console.log("PROFILE USER:", user);
+
+  // ❌ DO NOT REDIRECT IMMEDIATELY
+  if (!user) return;
 
   const username = user.email.split("@")[0];
 
-  // PROFILE INFO
-  profileName.innerHTML = username;
+  profileName.textContent = username;
+  profileUsername.textContent = "@" + username;
+  profileBio.textContent = "Welcome to Mamaspace 💕";
 
-  profileUsername.innerHTML = "@" + username;
-
-  profileBio.innerHTML = "Welcome to Mamaspace 💕";
-
-  // LOAD USER POSTS
   loadPosts(user.email);
 
 });
 
-// LOAD POSTS
 function loadPosts(email) {
 
   const q = query(
@@ -71,13 +47,7 @@ function loadPosts(email) {
     userPosts.innerHTML = "";
 
     if (snapshot.empty) {
-
-      userPosts.innerHTML = `
-        <div class="post">
-          No posts yet 💕
-        </div>
-      `;
-
+      userPosts.innerHTML = `<div class="post">No posts yet 💕</div>`;
       return;
     }
 
@@ -85,43 +55,29 @@ function loadPosts(email) {
 
       const post = doc.data();
 
-      const postHTML = `
+      userPosts.innerHTML += `
         <div class="post">
 
-          <div style="font-weight:700;
-                      margin-bottom:10px;
-                      color:#ff4d94;">
+          <div style="font-weight:700;color:#ff4d94;">
             ${post.user}
           </div>
 
-          <div style="margin-bottom:15px;">
+          <div style="margin:10px 0;">
             ${post.content || ""}
           </div>
 
           ${post.imageUrl ? `
             <img src="${post.imageUrl}"
-                 style="
-                   width:100%;
-                   border-radius:18px;
-                   margin-top:10px;
-                 ">
+              style="width:100%;border-radius:15px;">
           ` : ""}
 
-          <div style="
-            margin-top:15px;
-            display:flex;
-            gap:20px;
-            color:#888;
-            font-size:14px;
-          ">
-            <div>❤️ ${post.likes || 0}</div>
-            <div>💬 ${(post.comments || []).length}</div>
+          <div style="margin-top:10px;color:#888;">
+            ❤️ ${post.likes || 0} |
+            💬 ${(post.comments || []).length}
           </div>
 
         </div>
       `;
-
-      userPosts.innerHTML += postHTML;
 
     });
 
