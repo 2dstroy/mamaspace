@@ -1,10 +1,10 @@
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 import { 
   getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, 
-  arrayUnion, increment, query, orderBy 
+  arrayUnion, increment, query, orderBy, getDoc, setDoc, deleteDoc 
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-
 import { 
   getStorage, ref, uploadBytes, getDownloadURL 
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
@@ -26,6 +26,7 @@ const storage = getStorage(app);
 let currentUser = null;
 let selectedFile = null;
 
+// DOM Elements
 const postBtn = document.querySelector(".post-btn");
 const textarea = document.querySelector(".compose-input");
 const postsContainer = document.getElementById("postsContainer");
@@ -40,18 +41,14 @@ imageIcon.addEventListener("click", () => fileInput.click());
 
 fileInput.addEventListener("change", (e) => {
   selectedFile = e.target.files[0];
-  if (selectedFile) {
-    alert(`Selected: ${selectedFile.name}`);
-  }
+  if (selectedFile) alert(`Selected: ${selectedFile.name}`);
 });
 
-// AUTH
+// ====================== AUTH ======================
 onAuthStateChanged(auth, (user) => {
   if (user) {
     currentUser = user;
-
     const username = user.email.split("@")[0];
-
     userInfo.innerHTML = `Welcome back, <b>@${username}</b>`;
   } else {
     alert("Please login first");
@@ -59,7 +56,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// CREATE POST
+// ====================== CREATE POST ======================
 postBtn.addEventListener("click", async () => {
   if (!currentUser) return;
 
@@ -73,13 +70,8 @@ postBtn.addEventListener("click", async () => {
     let imageUrl = "";
 
     if (selectedFile) {
-      const storageRef = ref(
-        storage,
-        "posts/" + Date.now() + "_" + selectedFile.name
-      );
-
+      const storageRef = ref(storage, `posts/${Date.now()}_${selectedFile.name}`);
       await uploadBytes(storageRef, selectedFile);
-
       imageUrl = await getDownloadURL(storageRef);
     }
 
@@ -87,7 +79,7 @@ postBtn.addEventListener("click", async () => {
 
     await addDoc(collection(db, "posts"), {
       user: username,
-      username: "@" + username,
+      username: `@${username}`,
       email: currentUser.email,
       avatar: "👩‍🍼",
       content: text,
@@ -99,154 +91,124 @@ postBtn.addEventListener("click", async () => {
 
     textarea.value = "";
     selectedFile = null;
+    fileInput.value = ""; // clear file input
 
     alert("Posted successfully 💕");
 
   } catch (err) {
     console.error(err);
-    alert("Failed to post");
+    alert("Failed to post. Please try again.");
   }
 });
 
-// LOAD POSTS
-const q = query(
-  collection(db, "posts"),
-  orderBy("createdAt", "desc")
-);
+// ====================== LOAD POSTS ======================
+const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
 
 onSnapshot(q, (snapshot) => {
   postsContainer.innerHTML = "";
 
   snapshot.forEach((docSnap) => {
-
     const post = docSnap.data();
     const postId = docSnap.id;
 
     const postHTML = `
       <div class="post">
-
         <div class="post-header">
           <div class="avatar">${post.avatar || "👩‍🍼"}</div>
-
           <div>
             <div class="post-user">${post.user}</div>
-            <div style="color:#888;font-size:14px;">
-              ${post.username}
-            </div>
+            <div style="color:#888; font-size:14px;">${post.username}</div>
           </div>
         </div>
 
-        <div class="post-content">
-          ${post.content || ""}
-        </div>
+        <div class="post-content">${post.content || ""}</div>
 
         ${post.imageUrl ? `
-          <img src="${post.imageUrl}" class="post-image">
+          <img src="${post.imageUrl}" class="post-image" alt="Post image">
         ` : ""}
 
         <div class="post-footer">
           <div class="action-btn like-btn" data-id="${postId}">
-            ❤️ ${post.likes || 0}
+            ❤️ <span class="like-count">${post.likes || 0}</span>
           </div>
-
           <div class="action-btn comment-btn" data-id="${postId}">
             💬 ${(post.comments || []).length}
           </div>
         </div>
 
-        <div class="comment-section" id="comments-${postId}">
-
-          ${(post.comments || [])
-            .map(c => `<div class="comment">${c}</div>`)
-            .join("")}
-
+        <div class="comment-section" id="comments-${postId}" style="display:none;">
+          ${(post.comments || []).map(c => `<div class="comment">${c}</div>`).join("")}
+          
           <div class="comment-input">
-            <input 
-              type="text"
-              placeholder="Write a comment..."
-              class="comment-text"
-            >
-
-            <button class="send-comment" data-id="${postId}">
-              Send
-            </button>
+            <input type="text" placeholder="Write a comment..." class="comment-text">
+            <button class="send-comment" data-id="${postId}">Send</button>
           </div>
-
         </div>
-
       </div>
     `;
 
     postsContainer.innerHTML += postHTML;
   });
-
-  attachEvents();
 });
 
-// EVENTS
-function attachEvents() {
+// ====================== EVENT DELEGATION ======================
+postsContainer.addEventListener("click", async (e) => {
+  const likeBtn = e.target.closest(".like-btn");
+  const commentBtn = e.target.closest(".comment-btn");
+  const sendBtn = e.target.closest(".send-comment");
 
-  // LIKE
-  document.querySelectorAll(".like-btn").forEach(btn => {
+  // LIKE BUTTON
+  if (likeBtn) {
+    const postId = likeBtn.dataset.id;
+    const user = auth.currentUser;
+    if (!user) return alert("Please login first!");
 
-    btn.addEventListener("click", async () => {
+    const postRef = doc(db, "posts", postId);
+    const likeRef = doc(db, "posts", postId, "likes", user.uid);
 
-      const postRef = doc(db, "posts", btn.dataset.id);
+    try {
+      const likeSnap = await getDoc(likeRef);
 
-      await updateDoc(postRef, {
-        likes: increment(1)
-      });
+      if (likeSnap.exists()) {
+        // Unlike
+        await deleteDoc(likeRef);
+        await updateDoc(postRef, { likes: increment(-1) });
+      } else {
+        // Like
+        await setDoc(likeRef, { likedAt: Date.now() });
+        await updateDoc(postRef, { likes: increment(1) });
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error updating like");
+    }
+  }
 
-    });
-
-  });
-
-  // TOGGLE COMMENTS
-  document.querySelectorAll(".comment-btn").forEach(btn => {
-
-    btn.addEventListener("click", () => {
-
-      const section = document.getElementById(
-        `comments-${btn.dataset.id}`
-      );
-
-      section.style.display =
-        section.style.display === "block"
-          ? "none"
-          : "block";
-
-    });
-
-  });
+  // TOGGLE COMMENT SECTION
+  if (commentBtn) {
+    const section = document.getElementById(`comments-${commentBtn.dataset.id}`);
+    section.style.display = section.style.display === "block" ? "none" : "block";
+  }
 
   // SEND COMMENT
-  document.querySelectorAll(".send-comment").forEach(btn => {
+  if (sendBtn) {
+    const input = sendBtn.previousElementSibling;
+    const text = input.value.trim();
+    if (!text || !currentUser) return;
 
-    btn.addEventListener("click", async () => {
+    const postId = sendBtn.dataset.id;
+    const username = currentUser.email.split("@")[0];
+    const postRef = doc(db, "posts", postId);
 
-      const input = btn.previousElementSibling;
-
-      const text = input.value.trim();
-
-      if (!text || !currentUser) return;
-
-      const username =
-        currentUser.email.split("@")[0];
-
-      const postRef = doc(
-        db,
-        "posts",
-        btn.dataset.id
-      );
-
+    try {
       await updateDoc(postRef, {
         comments: arrayUnion(`@${username}: ${text}`)
       });
-
       input.value = "";
-
-    });
-
-  });
-
-}
+    } catch (err) {
+      console.error(err);
+      alert("Failed to post comment");
+    }
+  }
+});
+</script>
