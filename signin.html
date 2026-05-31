@@ -1,126 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Welcome Back • Mamaspace</title>
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - MamaSpace</title>
   <style>
-    .gradient-bg{
-      background: linear-gradient(135deg,#f8fafc 0%,#f3e8ff 100%);
-    }
+    body { font-family: Arial, sans-serif; background: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .login-container { width: 100%; max-width: 380px; padding: 2rem; text-align: center; }
+    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+    button { width: 100%; padding: 14px; background: #ff69b4; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 10px 0; }
+    button:hover { background: #ff4da6; }
+    .link { color: #ff69b4; text-decoration: none; }
   </style>
 </head>
+<body>
 
-<body class="gradient-bg min-h-screen flex items-center justify-center relative overflow-hidden">
+<div class="login-container">
+  <h1>👩‍🍼 MamaSpace</h1>
+  <h2>Welcome Back</h2>
 
-  <!-- Background Glow -->
-  <div class="fixed inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(236,72,153,0.25),transparent)]"></div>
-  <div class="fixed inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(168,85,247,0.25),transparent)]"></div>
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="password" id="password" placeholder="Password" required>
 
-  <div class="relative z-10 max-w-md w-full px-6 py-12">
+  <button id="loginBtn">Login</button>
+  <button id="signupBtn" style="background:#ccc;">Create Account</button>
 
-    <div class="bg-white rounded-3xl p-8 shadow-2xl">
+  <p><a href="#" class="link" id="forgotLink">Forgot Password?</a></p>
+</div>
 
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <div class="inline-flex w-16 h-16 bg-purple-100 rounded-2xl items-center justify-center mb-4">
-          <i class="fa-solid fa-baby text-4xl text-purple-500"></i>
-        </div>
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword,
+    sendPasswordResetEmail 
+  } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
-        <h1 class="text-3xl font-bold text-gray-900">
-          Welcome Back Mama
-        </h1>
-        <p class="text-gray-600 mt-2">
-          Sign in to continue your journey
-        </p>
-      </div>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
+    authDomain: "mamaspace-bf004.firebaseapp.com",
+    projectId: "mamaspace-bf004",
+    storageBucket: "mamaspace-bf004.firebasestorage.app",
+    messagingSenderId: "520083469560",
+    appId: "1:520083469560:web:d83cec2ce32ba0fa1bf70d"
+  };
 
-      <!-- Message Box -->
-      <div id="messageBox" class="hidden mb-4 p-4 rounded-2xl text-sm font-medium"></div>
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-      <!-- Sign In Form -->
-      <form id="signinForm" class="space-y-6">
+  // ====================== LOGIN ======================
+  document.getElementById("loginBtn").addEventListener("click", async () => {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-        <!-- Email -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Email Address
-          </label>
-          <input
-            type="email"
-            id="email"
-            placeholder="you@example.com"
-            required
-            class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-purple-500 transition-colors"
-          />
-        </div>
+    if (!email || !password) return alert("Please enter email and password");
 
-        <!-- Password -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Password
-          </label>
-          <div class="relative">
-            <input
-              type="password"
-              id="password"
-              placeholder="Enter your password"
-              required
-              class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-purple-500 transition-colors pr-12"
-            />
-            <button
-              type="button"
-              id="togglePassword"
-              class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <i class="fa-solid fa-eye"></i>
-            </button>
-          </div>
-        </div>
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "index.html"; // or wherever your main page is
+    } catch (err) {
+      console.error(err);
+      alert("Login failed: " + err.message);
+    }
+  });
 
-        <!-- Forgot Password -->
-        <div class="text-right">
-          <button
-            type="button"
-            id="forgotPasswordBtn"
-            class="text-pink-500 text-sm font-semibold hover:underline"
-          >
-            Forgot Password?
-          </button>
-        </div>
+  // ====================== SIGN UP ======================
+  document.getElementById("signupBtn").addEventListener("click", async () => {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-        <!-- Submit Button -->
-        <button
-          type="submit"
-          id="submitBtn"
-          class="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold py-4 rounded-2xl text-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-70"
-        >
-          <span id="btnText">Sign In</span>
-          <i id="btnIcon" class="fa-solid fa-right-to-bracket"></i>
-        </button>
+    if (!email || !password) return alert("Please enter email and password");
+    if (password.length < 6) return alert("Password should be at least 6 characters");
 
-        <!-- Signup Link -->
-        <p class="text-center text-sm text-gray-600">
-          Don’t have an account? 
-          <a href="signup.html" class="text-pink-500 font-semibold hover:underline">
-            Create one
-          </a>
-        </p>
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      alert("Account created successfully! 🎉");
+      window.location.href = "index.html";
+    } catch (err) {
+      console.error(err);
+      alert("Sign up failed: " + err.message);
+    }
+  });
 
-      </form>
+  // ====================== FORGOT PASSWORD ======================
+  document.getElementById("forgotLink").addEventListener("click", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value.trim();
 
-    </div>
-  </div>
+    if (!email) return alert("Please enter your email first");
 
-  <!-- 🔥 Firebase + Login Script -->
-  <script type="module" src="script/login.js"></script>
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert("Password reset link sent to your email 💌");
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  });
+
+  // Optional: Allow pressing Enter to login
+  document.getElementById("password").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") document.getElementById("loginBtn").click();
+  });
+</script>
 
 </body>
 </html>
