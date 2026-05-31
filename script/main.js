@@ -1,14 +1,15 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { 
-  getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, 
-  arrayUnion, increment, query, orderBy, serverTimestamp, getDoc, setDoc, deleteDoc 
+import {
+  getFirestore, collection, addDoc, onSnapshot, updateDoc, doc,
+  arrayUnion, increment, query, orderBy, serverTimestamp,
+  getDoc, setDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-import { 
-  getStorage, ref, uploadBytes, getDownloadURL 
+import {
+  getStorage, ref, uploadBytes, getDownloadURL
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
 
+// ================= FIREBASE CONFIG =================
 const firebaseConfig = {
   apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
   authDomain: "mamaspace-bf004.firebaseapp.com",
@@ -23,10 +24,11 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
+// ================= GLOBALS =================
 let currentUser = null;
 let selectedFile = null;
 
-// DOM Elements
+// ================= DOM =================
 const postBtn = document.querySelector(".post-btn");
 const textarea = document.querySelector(".compose-input");
 const postsContainer = document.getElementById("postsContainer");
@@ -44,7 +46,7 @@ fileInput.addEventListener("change", (e) => {
   if (selectedFile) alert(`Selected: ${selectedFile.name}`);
 });
 
-// ====================== AUTH ======================
+// ================= AUTH =================
 onAuthStateChanged(auth, (user) => {
   if (user) {
     currentUser = user;
@@ -56,14 +58,16 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// ====================== CREATE POST ======================
+// ================= CREATE POST =================
 postBtn.addEventListener("click", async () => {
   if (!currentUser) return;
+
   const text = textarea.value.trim();
   if (!text && !selectedFile) return alert("Write something or add a photo 💕");
 
   try {
     let imageUrl = "";
+
     if (selectedFile) {
       const storageRef = ref(storage, `posts/${Date.now()}_${selectedFile.name}`);
       await uploadBytes(storageRef, selectedFile);
@@ -76,6 +80,7 @@ postBtn.addEventListener("click", async () => {
       user: username,
       username: `@${username}`,
       email: currentUser.email,
+      userId: currentUser.uid, // ✅ IMPORTANT FIX
       avatar: "👩‍🍼",
       content: text,
       imageUrl: imageUrl,
@@ -88,17 +93,19 @@ postBtn.addEventListener("click", async () => {
     selectedFile = null;
     fileInput.value = "";
     alert("Posted successfully 💕");
+
   } catch (err) {
     console.error(err);
     alert("Failed to post");
   }
 });
 
-// ====================== LOAD POSTS ======================
+// ================= LOAD POSTS =================
 const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
 
 onSnapshot(q, (snapshot) => {
   postsContainer.innerHTML = "";
+
   snapshot.forEach((docSnap) => {
     const post = docSnap.data();
     const postId = docSnap.id;
@@ -112,20 +119,28 @@ onSnapshot(q, (snapshot) => {
             <div style="color:#888;font-size:14px;">${post.username}</div>
           </div>
         </div>
+
         <div class="post-content">${post.content || ""}</div>
-        ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="post image">` : ""}
-        
+
+        ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image">` : ""}
+
         <div class="post-footer">
           <div class="action-btn like-btn" data-id="${postId}">
-            ❤️ <span class="like-count">${post.likes || 0}</span>
+            ❤️ <span>${post.likes || 0}</span>
           </div>
+
           <div class="action-btn comment-btn" data-id="${postId}">
             💬 ${(post.comments || []).length}
+          </div>
+
+          <div class="action-btn delete-btn" data-id="${postId}">
+            🗑 Delete
           </div>
         </div>
 
         <div class="comment-section" id="comments-${postId}" style="display:none;">
           ${(post.comments || []).map(c => `<div class="comment">${c}</div>`).join("")}
+
           <div class="comment-input">
             <input type="text" placeholder="Write a comment..." class="comment-text">
             <button class="send-comment" data-id="${postId}">Send</button>
@@ -133,18 +148,20 @@ onSnapshot(q, (snapshot) => {
         </div>
       </div>
     `;
+
     postsContainer.innerHTML += postHTML;
   });
 });
 
-// ====================== LIKE + COMMENT ======================
+// ================= ACTIONS =================
 postsContainer.addEventListener("click", async (e) => {
   if (!currentUser) return alert("Please login first!");
 
-  // LIKE / UNLIKE
+  // ================= LIKE =================
   if (e.target.closest(".like-btn")) {
-    const likeBtn = e.target.closest(".like-btn");
-    const postId = likeBtn.dataset.id;
+    const btn = e.target.closest(".like-btn");
+    const postId = btn.dataset.id;
+
     const postRef = doc(db, "posts", postId);
     const likeRef = doc(db, "posts", postId, "likes", currentUser.uid);
 
@@ -152,30 +169,26 @@ postsContainer.addEventListener("click", async (e) => {
       const likeSnap = await getDoc(likeRef);
 
       if (likeSnap.exists()) {
-        // UNLIKE
         await deleteDoc(likeRef);
         await updateDoc(postRef, { likes: increment(-1) });
-        likeBtn.style.color = "";
       } else {
-        // LIKE
         await setDoc(likeRef, { likedAt: Date.now() });
         await updateDoc(postRef, { likes: increment(1) });
-        likeBtn.style.color = "red";
       }
     } catch (err) {
       console.error(err);
-      alert("Like failed. Check Firebase Rules.");
+      alert("Like failed");
     }
   }
 
-  // TOGGLE COMMENTS
+  // ================= COMMENTS TOGGLE =================
   if (e.target.closest(".comment-btn")) {
     const btn = e.target.closest(".comment-btn");
     const section = document.getElementById(`comments-${btn.dataset.id}`);
     section.style.display = section.style.display === "block" ? "none" : "block";
   }
 
-  // SEND COMMENT
+  // ================= SEND COMMENT =================
   if (e.target.closest(".send-comment")) {
     const btn = e.target.closest(".send-comment");
     const input = btn.previousElementSibling;
@@ -183,17 +196,49 @@ postsContainer.addEventListener("click", async (e) => {
     if (!text) return;
 
     const postId = btn.dataset.id;
-    const username = currentUser.email.split("@")[0];
     const postRef = doc(db, "posts", postId);
+
+    const username = currentUser.email.split("@")[0];
 
     try {
       await updateDoc(postRef, {
         comments: arrayUnion(`@${username}: ${text}`)
       });
+
       input.value = "";
     } catch (err) {
       console.error(err);
-      alert("Failed to send comment");
+      alert("Comment failed");
+    }
+  }
+
+  // ================= DELETE POST =================
+  if (e.target.closest(".delete-btn")) {
+    const btn = e.target.closest(".delete-btn");
+    const postId = btn.dataset.id;
+
+    const postRef = doc(db, "posts", postId);
+
+    try {
+      const postSnap = await getDoc(postRef);
+
+      if (!postSnap.exists()) {
+        return alert("Post not found!");
+      }
+
+      const post = postSnap.data();
+
+      // ✅ SECURITY CHECK
+      if (post.userId !== currentUser.uid) {
+        return alert("Not your post!");
+      }
+
+      await deleteDoc(postRef);
+
+      alert("Post deleted 🗑");
+    } catch (err) {
+      console.error(err);
+      alert("Delete failed");
     }
   }
 });
