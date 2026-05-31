@@ -44,7 +44,7 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
   const password = document.getElementById("password").value;
 
   if (!email || !password) {
-    alert("Please enter email and password");
+    alert("Please fill up signup form");
     return;
   }
   if (password.length < 6) {
