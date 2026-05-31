@@ -7,160 +7,99 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    .compose-box{
-      background:#fff;
-      padding:15px;
-      border-radius:14px;
-      box-shadow:0 5px 20px rgba(0,0,0,0.06);
-      margin-bottom:20px;
-    }
-
-    .compose-input{
-      width:100%;
-      border:none;
-      outline:none;
-      resize:none;
-      font-size:14px;
-      min-height:80px;
-      padding:10px;
-      border-radius:10px;
-      background:#f7f7f7;
-    }
-
-    .compose-actions{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-top:10px;
-    }
-
-    .post-btn{
-      background:#ff7aa2;
-      color:#fff;
-      border:none;
-      padding:8px 14px;
-      border-radius:10px;
-      cursor:pointer;
-    }
-
-    .post{
-      background:#fff;
-      padding:15px;
-      border-radius:14px;
-      box-shadow:0 5px 15px rgba(0,0,0,0.05);
-      margin-bottom:15px;
-    }
-
-    .post-header{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-bottom:10px;
-    }
-
-    .avatar{
-      width:35px;
-      height:35px;
-      border-radius:50%;
-      background:#ffd6e7;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .post-content{
-      margin-top:8px;
-    }
-
-    .post-image{
-      width:100%;
-      border-radius:10px;
-      margin-top:10px;
-    }
-
-    .post-footer{
-      display:flex;
-      gap:20px;
-      margin-top:10px;
-      font-size:14px;
-      color:#555;
-    }
-
-    .action-btn{
-      cursor:pointer;
-      user-select:none;
-    }
-  </style>
 </head>
 
 <body>
 
-<div class="app">
+  <div class="background-glow"></div>
+  <div class="background-glow2"></div>
 
-  <!-- LEFT -->
-  <div class="sidebar">
-    <div class="logo">🍼 MAMASPACE</div>
+  <div class="app">
 
-    <div class="nav">
-      <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> Home</a>
-      <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i> Explore</a>
-      <a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i> Profile</a>
-    </div>
-  </div>
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar">
+      <div class="logo"><span>🍼</span> MAMASPACE</div>
 
-  <!-- MAIN -->
-  <div class="main">
-
-    <div class="header">
-      <h1>Home Feed</h1>
-      <div id="userInfo"></div>
-    </div>
-
-    <!-- COMPOSE BOX -->
-    <div class="compose-box">
-      <textarea id="postInput" class="compose-input" placeholder="Share your moment..."></textarea>
-
-      <div class="compose-actions">
-        <i id="imageIcon" class="fa-solid fa-image" style="cursor:pointer;font-size:18px;"></i>
-        <button class="post-btn">Post</button>
+      <div class="nav">
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>Explore</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-heart"></i><span>Mom Circle</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-baby"></i><span>Baby Milestones</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i><span>Archive</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-envelope"></i><span>Messages</span></a>
+        <a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Profile</span></a>
       </div>
+
+      <button class="share-btn">
+        <i class="fa-solid fa-feather-pointed"></i> Share Moment
+      </button>
     </div>
 
-    <!-- POSTS -->
-    <div id="postsContainer">
+    <!-- MAIN -->
+    <div class="main">
 
-      <!-- SAMPLE -->
-      <div class="post">
-        <div class="post-header">
+      <div class="header">
+        <h1>Home Feed</h1>
+
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div id="userInfo"></div>
           <div class="avatar">👩‍🍼</div>
-          <div>
-            <b>Maya Santos</b><br>
-            <small>Just now</small>
-          </div>
-        </div>
-
-        <div class="post-content">
-          My baby finally slept through the night 😭💖
         </div>
       </div>
 
+      <!-- COMPOSE -->
+      <div class="compose">
+        <div class="compose-top">
+          <div class="avatar">👩‍🍼</div>
+          <textarea class="compose-input" placeholder="What's on your mind, mama? 💕"></textarea>
+        </div>
+
+        <div class="compose-actions">
+          <div class="compose-icons">
+            <i id="imageIcon" class="fa-solid fa-image"></i>
+            <i class="fa-solid fa-heart"></i>
+            <i class="fa-solid fa-baby"></i>
+          </div>
+
+          <button class="post-btn">Post to Mamaspace</button>
+        </div>
+      </div>
+
+      <!-- POSTS -->
+      <div id="postsContainer"></div>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="right-sidebar">
+      <h2 class="articles-title">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        My Articles
+      </h2>
+
+      <div class="articles">
+        <div>
+          <p class="title">My Birth Story</p>
+          <p class="meta">May 12, 2024 • 87 likes</p>
+        </div>
+        <div>
+          <p class="title">Navigating Sleep Regression</p>
+          <p class="meta">Apr 28, 2024 • 152 likes</p>
+        </div>
+        <div>
+          <p class="title">First Foods & Fun Messes</p>
+          <p class="meta">Apr 15, 2024 • 64 likes</p>
+        </div>
+        <div>
+          <p class="title">Finding Mom Friends</p>
+          <p class="meta">Mar 30, 2024 • 201 likes</p>
+        </div>
+      </div>
     </div>
 
   </div>
 
-  <!-- RIGHT -->
-  <div class="right-sidebar">
-    <h3>My Articles</h3>
-    <p><b>My Birth Story</b></p>
-    <small>May 12, 2024</small>
-  </div>
-
-</div>
-
-<!-- FIREBASE SCRIPT -->
-<script type="module" src="script/main.js"></script>
-
+  <script type="module" src="script/main.js"></script>
 </body>
 </html>
