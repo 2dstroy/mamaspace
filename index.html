@@ -9,8 +9,6 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* SIMPLE COMPOSE UI (you can move to style.css later) */
-
     .compose-box{
       background:#fff;
       padding:15px;
@@ -19,7 +17,7 @@
       margin-bottom:20px;
     }
 
-    .compose-box textarea{
+    .compose-input{
       width:100%;
       border:none;
       outline:none;
@@ -38,7 +36,7 @@
       margin-top:10px;
     }
 
-    .compose-actions button{
+    .post-btn{
       background:#ff7aa2;
       color:#fff;
       border:none;
@@ -62,7 +60,7 @@
       margin-bottom:10px;
     }
 
-    .post-avatar{
+    .avatar{
       width:35px;
       height:35px;
       border-radius:50%;
@@ -72,112 +70,97 @@
       justify-content:center;
     }
 
-    .post-name{
-      font-weight:600;
-      font-size:14px;
+    .post-content{
+      margin-top:8px;
     }
 
-    .post-time{
-      font-size:12px;
-      color:#888;
+    .post-image{
+      width:100%;
+      border-radius:10px;
+      margin-top:10px;
+    }
+
+    .post-footer{
+      display:flex;
+      gap:20px;
+      margin-top:10px;
+      font-size:14px;
+      color:#555;
+    }
+
+    .action-btn{
+      cursor:pointer;
+      user-select:none;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="background-glow"></div>
-  <div class="background-glow2"></div>
+<div class="app">
 
-  <div class="app">
+  <!-- LEFT -->
+  <div class="sidebar">
+    <div class="logo">🍼 MAMASPACE</div>
 
-    <!-- LEFT SIDEBAR -->
-    <div class="sidebar">
-      <div class="logo"><span>🍼</span> MAMASPACE</div>
+    <div class="nav">
+      <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i> Explore</a>
+      <a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i> Profile</a>
+    </div>
+  </div>
 
-      <div class="nav">
-        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>Explore</span></a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-heart"></i><span>Mom Circle</span></a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-baby"></i><span>Baby Milestones</span></a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
-        <a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Profile</span></a>
-      </div>
+  <!-- MAIN -->
+  <div class="main">
 
-      <button class="share-btn">
-        <i class="fa-solid fa-feather-pointed"></i> Share Moment
-      </button>
+    <div class="header">
+      <h1>Home Feed</h1>
+      <div id="userInfo"></div>
     </div>
 
-    <!-- MAIN FEED -->
-    <div class="main">
+    <!-- COMPOSE BOX -->
+    <div class="compose-box">
+      <textarea id="postInput" class="compose-input" placeholder="Share your moment..."></textarea>
 
-      <div class="header">
-        <h1>Home Feed</h1>
+      <div class="compose-actions">
+        <i id="imageIcon" class="fa-solid fa-image" style="cursor:pointer;font-size:18px;"></i>
+        <button class="post-btn">Post</button>
+      </div>
+    </div>
 
-        <div style="display:flex; align-items:center; gap:12px;">
-          <div id="userInfo" style="text-align:right; font-size:14px; color:#666;"></div>
+    <!-- POSTS -->
+    <div id="postsContainer">
+
+      <!-- SAMPLE -->
+      <div class="post">
+        <div class="post-header">
           <div class="avatar">👩‍🍼</div>
-        </div>
-      </div>
-
-      <!-- ✅ COMPOSE POST BOX -->
-      <div class="compose-box">
-        <textarea id="postInput" placeholder="Share your moment..."></textarea>
-
-        <div class="compose-actions">
-          <small style="color:#888;">Post as Mom</small>
-          <button onclick="createPost()">Post</button>
-        </div>
-      </div>
-
-      <!-- FEED -->
-      <div id="postsContainer">
-
-        <!-- SAMPLE POST -->
-        <div class="post">
-          <div class="post-header">
-            <div class="post-avatar">👩‍🍼</div>
-            <div>
-              <div class="post-name">Maya Santos</div>
-              <div class="post-time">Just now</div>
-            </div>
-          </div>
-
-          <div class="post-content">
-            My baby finally slept through the night 😭💖
+          <div>
+            <b>Maya Santos</b><br>
+            <small>Just now</small>
           </div>
         </div>
 
-      </div>
-
-    </div>
-
-    <!-- RIGHT SIDEBAR -->
-    <div class="right-sidebar">
-      <h2 class="articles-title">
-        <i class="fa-solid fa-clock-rotate-left"></i>
-        My Articles
-      </h2>
-
-      <div style="display:flex; flex-direction:column; gap:18px;">
-        <div>
-          <p style="font-weight:600;">My Birth Story</p>
-          <p style="font-size:13px; color:#888;">May 12, 2024 • 87 likes</p>
-        </div>
-
-        <div>
-          <p style="font-weight:600;">Navigating Sleep Regression</p>
-          <p style="font-size:13px; color:#888;">Apr 28, 2024 • 152 likes</p>
+        <div class="post-content">
+          My baby finally slept through the night 😭💖
         </div>
       </div>
+
     </div>
 
   </div>
 
+  <!-- RIGHT -->
+  <div class="right-sidebar">
+    <h3>My Articles</h3>
+    <p><b>My Birth Story</b></p>
+    <small>May 12, 2024</small>
+  </div>
 
- <!-- Firebase SDKs + Main Script -->
-  <script type="module" src="script/main.js"></script>
+</div>
+
+<!-- FIREBASE SCRIPT -->
+<script type="module" src="script/main.js"></script>
 
 </body>
 </html>
