@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { 
   getAuth, 
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  onAuthStateChanged 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail 
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -19,117 +19,70 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// DOM Elements
-const form = document.getElementById("signinForm");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const submitBtn = document.getElementById("submitBtn");
-const btnText = document.getElementById("btnText");
-const btnIcon = document.getElementById("btnIcon");
-const togglePasswordBtn = document.getElementById("togglePassword");
-const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
-const messageBox = document.getElementById("messageBox");
-
-// Show Message Function
-function showMessage(text, type = "error") {
-  messageBox.textContent = text;
-  messageBox.classList.remove("hidden");
-  messageBox.style.backgroundColor = type === "success" ? "#ecfdf5" : "#fee2e2";
-  messageBox.style.color = type === "success" ? "#10b981" : "#ef4444";
-  
-  setTimeout(() => {
-    messageBox.classList.add("hidden");
-  }, 5000);
-}
-
-// Toggle Password Visibility
-togglePasswordBtn.addEventListener("click", () => {
-  const isPassword = passwordInput.type === "password";
-  passwordInput.type = isPassword ? "text" : "password";
-  
-  togglePasswordBtn.innerHTML = isPassword 
-    ? `<i class="fa-solid fa-eye-slash"></i>` 
-    : `<i class="fa-solid fa-eye"></i>`;
-});
-
-// Login Form Submit
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
+// ====================== LOGIN ======================
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
   if (!email || !password) {
-    showMessage("Please enter email and password");
+    alert("Please enter email and password");
     return;
   }
 
-  // Loading State
-  submitBtn.disabled = true;
-  btnText.textContent = "Signing in...";
-  btnIcon.classList.add("fa-spinner", "fa-spin");
-  btnIcon.classList.remove("fa-right-to-bracket");
-
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    console.log("User logged in:", userCredential.user);
-    
-    showMessage("Welcome back Mama! ❤️", "success");
-    
-    // Redirect after short delay
-    setTimeout(() => {
-      window.location.href = "index.html";   // Change if your feed page has different name
-    }, 1500);
-
-  } catch (error) {
-    console.error(error);
-    let message = "Invalid email or password";
-
-    if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-      message = "Incorrect email or password";
-    } else if (error.code === "auth/invalid-email") {
-      message = "Please enter a valid email address";
-    } else if (error.code === "auth/too-many-requests") {
-      message = "Too many failed attempts. Try again later";
-    }
-
-    showMessage(message);
-  } finally {
-    // Reset button
-    submitBtn.disabled = false;
-    btnText.textContent = "Sign In";
-    btnIcon.classList.remove("fa-spinner", "fa-spin");
-    btnIcon.classList.add("fa-right-to-bracket");
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "index.html"; // Change to your main page
+  } catch (err) {
+    console.error(err);
+    alert("Login failed: " + err.message);
   }
 });
 
-// Forgot Password
-forgotPasswordBtn.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
+// ====================== SIGN UP ======================
+document.getElementById("signupBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    alert("Please enter email and password");
+    return;
+  }
+  if (password.length < 6) {
+    alert("Password should be at least 6 characters");
+    return;
+  }
+
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    alert("Account created successfully! 🎉");
+    window.location.href = "index.html";
+  } catch (err) {
+    console.error(err);
+    alert("Sign up failed: " + err.message);
+  }
+});
+
+// ====================== FORGOT PASSWORD ======================
+document.getElementById("forgotLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("email").value.trim();
 
   if (!email) {
-    showMessage("Please enter your email address first");
+    alert("Please enter your email first");
     return;
   }
 
   try {
     await sendPasswordResetEmail(auth, email);
-    showMessage("Password reset link sent to your email!", "success");
-  } catch (error) {
-    console.error(error);
-    if (error.code === "auth/invalid-email") {
-      showMessage("Please enter a valid email");
-    } else if (error.code === "auth/user-not-found") {
-      showMessage("No account found with this email");
-    } else {
-      showMessage("Failed to send reset email");
-    }
+    alert("Password reset link sent to your email 💌");
+  } catch (err) {
+    alert("Error: " + err.message);
   }
 });
 
-// Optional: Redirect if already logged in
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    window.location.href = "index.html"; // Change to your main feed page
+// Optional: Press Enter to login
+document.getElementById("password").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    document.getElementById("loginBtn").click();
   }
 });
