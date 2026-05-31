@@ -1,7 +1,11 @@
 <!-- Firebase SDKs -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { 
+    getAuth, 
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail 
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
@@ -15,19 +19,20 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // Update these IDs to match your login HTML form
+  // Form elements
   const form = document.getElementById("loginForm");
   const submitBtn = document.getElementById("submitBtn");
   const btnText = document.getElementById("btnText");
   const btnIcon = document.getElementById("btnIcon");
+  const forgotLink = document.getElementById("forgotPassword");
 
+  // Login Form Submit
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
-    // Basic validation
     if (!email || !password) {
       alert("Please enter both email and password.");
       return;
@@ -41,14 +46,10 @@
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      console.log("User signed in:", user);
+      console.log("User signed in:", userCredential.user);
 
       alert(`Welcome back to Mamaspace! ❤️`);
-
-      // Redirect to dashboard (change path if needed)
-      window.location.href = "/dashboard.html";
+      window.location.href = "/dashboard.html";   // ← Change if needed
 
     } catch (error) {
       console.error(error);
@@ -64,11 +65,38 @@
 
       alert(message);
     } finally {
-      // Reset button
       submitBtn.disabled = false;
       btnText.textContent = "Sign In";
       btnIcon.classList.add("fa-heart");
       btnIcon.classList.remove("fa-spinner", "fa-spin");
     }
   });
+
+  // Forgot Password
+  if (forgotLink) {
+    forgotLink.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+
+      if (!email) {
+        alert("Please enter your email address first.");
+        return;
+      }
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert("✅ Password reset link has been sent to your email!");
+      } catch (error) {
+        console.error(error);
+        if (error.code === "auth/invalid-email") {
+          alert("Please enter a valid email address.");
+        } else if (error.code === "auth/user-not-found") {
+          alert("No account found with this email.");
+        } else {
+          alert("Failed to send reset email. Please try again.");
+        }
+      }
+    });
+  }
 </script>
