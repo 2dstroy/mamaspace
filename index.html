@@ -7,6 +7,81 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* SIMPLE COMPOSE UI (you can move to style.css later) */
+
+    .compose-box{
+      background:#fff;
+      padding:15px;
+      border-radius:14px;
+      box-shadow:0 5px 20px rgba(0,0,0,0.06);
+      margin-bottom:20px;
+    }
+
+    .compose-box textarea{
+      width:100%;
+      border:none;
+      outline:none;
+      resize:none;
+      font-size:14px;
+      min-height:80px;
+      padding:10px;
+      border-radius:10px;
+      background:#f7f7f7;
+    }
+
+    .compose-actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:10px;
+    }
+
+    .compose-actions button{
+      background:#ff7aa2;
+      color:#fff;
+      border:none;
+      padding:8px 14px;
+      border-radius:10px;
+      cursor:pointer;
+    }
+
+    .post{
+      background:#fff;
+      padding:15px;
+      border-radius:14px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.05);
+      margin-bottom:15px;
+    }
+
+    .post-header{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .post-avatar{
+      width:35px;
+      height:35px;
+      border-radius:50%;
+      background:#ffd6e7;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .post-name{
+      font-weight:600;
+      font-size:14px;
+    }
+
+    .post-time{
+      font-size:12px;
+      color:#888;
+    }
+  </style>
 </head>
 
 <body>
@@ -25,9 +100,7 @@
         <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>Explore</span></a>
         <a href="#" class="nav-item"><i class="fa-solid fa-heart"></i><span>Mom Circle</span></a>
         <a href="#" class="nav-item"><i class="fa-solid fa-baby"></i><span>Baby Milestones</span></a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i><span>Archive</span></a>
         <a href="#" class="nav-item"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-envelope"></i><span>Messages</span></a>
         <a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Profile</span></a>
       </div>
 
@@ -48,8 +121,35 @@
         </div>
       </div>
 
-      <!-- FEED ONLY -->
-      <div id="postsContainer"></div>
+      <!-- ✅ COMPOSE POST BOX -->
+      <div class="compose-box">
+        <textarea id="postInput" placeholder="Share your moment..."></textarea>
+
+        <div class="compose-actions">
+          <small style="color:#888;">Post as Mom</small>
+          <button onclick="createPost()">Post</button>
+        </div>
+      </div>
+
+      <!-- FEED -->
+      <div id="postsContainer">
+
+        <!-- SAMPLE POST -->
+        <div class="post">
+          <div class="post-header">
+            <div class="post-avatar">👩‍🍼</div>
+            <div>
+              <div class="post-name">Maya Santos</div>
+              <div class="post-time">Just now</div>
+            </div>
+          </div>
+
+          <div class="post-content">
+            My baby finally slept through the night 😭💖
+          </div>
+        </div>
+
+      </div>
 
     </div>
 
@@ -70,22 +170,14 @@
           <p style="font-weight:600;">Navigating Sleep Regression</p>
           <p style="font-size:13px; color:#888;">Apr 28, 2024 • 152 likes</p>
         </div>
-
-        <div>
-          <p style="font-weight:600;">First Foods & Fun Messes</p>
-          <p style="font-size:13px; color:#888;">Apr 15, 2024 • 64 likes</p>
-        </div>
-
-        <div>
-          <p style="font-weight:600;">Finding Mom Friends</p>
-          <p style="font-size:13px; color:#888;">Mar 30, 2024 • 201 likes</p>
-        </div>
       </div>
     </div>
 
   </div>
 
-  <script type="module" src="script/main.js"></script>
+
+ <!-- Firebase SDKs + Main Script -->
+  <script type="module" src="script/signup.js"></script>
 
 </body>
 </html>
