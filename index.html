@@ -4,11 +4,178 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Mamaspace • For Moms & Babies</title>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
-</head>
 
+  <style>
+    *{ margin:0; padding:0; box-sizing:border-box; }
+
+    body{
+      font-family:'Segoe UI',system-ui,Arial,sans-serif;
+      background:linear-gradient(135deg,#fff0f5,#e0f2fe,#f0f9ff);
+      color:#4a2c4f;
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    .background-glow, .background-glow2{
+      position:fixed; border-radius:50%; filter:blur(120px); opacity:0.15;
+      z-index:-1; pointer-events:none;
+    }
+    .background-glow{ width:500px; height:500px; background:#ff8fab; top:-150px; right:-150px; }
+    .background-glow2{ width:450px; height:450px; background:#7ed6ff; bottom:-150px; left:-150px; }
+
+    .app{ 
+      display:flex; 
+      min-height:100vh; 
+      max-width:1600px; 
+      margin:auto; 
+    }
+
+    /* LEFT SIDEBAR */
+    .sidebar{ 
+      width:260px; padding:24px; border-right:1px solid rgba(255,105,180,0.15);
+      background:rgba(255,255,255,0.85); backdrop-filter:blur(16px);
+      display:flex; flex-direction:column; gap:28px; position:sticky; top:0; height:100vh;
+    }
+    .logo{ 
+      font-size:30px; font-weight:800; 
+      background:linear-gradient(90deg,#ff8fab,#7ed6ff);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; 
+      display:flex; align-items:center; gap:10px; 
+    }
+    .nav{ display:flex; flex-direction:column; gap:8px; }
+    .nav-item{ 
+      display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:9999px;
+      text-decoration:none; color:#6b4e71; font-weight:600; transition:0.3s; 
+    }
+    .nav-item:hover, .nav-item.active{ 
+      background:rgba(255,143,171,0.15); color:#ff4d94; 
+    }
+    .nav-item i{ font-size:20px; }
+
+    .share-btn{ 
+      margin-top:auto; padding:15px; border:none; border-radius:9999px;
+      background:linear-gradient(135deg,#ff8fab,#7ed6ff); color:white; 
+      font-size:16px; font-weight:bold; cursor:pointer; transition:0.3s; 
+    }
+
+    /* RIGHT SIDEBAR */
+    .right-sidebar{
+      width:280px; 
+      padding:24px; 
+      border-left:1px solid rgba(255,105,180,0.15);
+      background:rgba(255,255,255,0.85); 
+      backdrop-filter:blur(16px);
+      position:sticky; 
+      top:0; 
+      height:100vh;
+      overflow-y:auto;
+    }
+    .articles-title{
+      font-size:22px; 
+      font-weight:700; 
+      color:#ff4d94; 
+      margin-bottom:20px;
+      display:flex; 
+      align-items:center; 
+      gap:10px;
+    }
+
+    /* MAIN CONTENT */
+    .main{ 
+      flex:1; 
+      padding:20px; 
+      overflow-y:auto; 
+    }
+    .header{ 
+      position:sticky; top:0; z-index:20; background:rgba(255,255,255,0.95);
+      backdrop-filter:blur(12px); padding:15px 0; margin-bottom:20px;
+      border-bottom:1px solid rgba(255,105,180,0.15); 
+      display:flex; align-items:center; justify-content:space-between; 
+    }
+    .header h1{ color:#ff4d94; font-size:28px; }
+
+    .avatar{
+      width:48px; height:48px; border-radius:50%; 
+      background:linear-gradient(135deg,#ff8fab,#7ed6ff);
+      display:flex; align-items:center; justify-content:center; font-size:24px;
+      border:3px solid white; box-shadow:0 4px 10px rgba(255,143,171,0.3);
+    }
+
+    /* Compose */
+    .compose{ 
+      background:white; border:1px solid rgba(255,143,171,0.2); border-radius:24px;
+      padding:20px; margin-bottom:24px; box-shadow:0 4px 15px rgba(255,143,171,0.1); 
+    }
+    .compose-top{ display:flex; gap:14px; }
+    .compose-input{ 
+      width:100%; 
+      border:none; 
+      outline:none; 
+      resize:none; 
+      background:transparent;
+      font-size:16px; 
+      color:#4a2c4f; 
+      min-height:90px;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .compose-actions{ 
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:16px; padding-top:16px; border-top:1px solid #ffe4f0; 
+    }
+    .compose-icons{ display:flex; gap:16px; color:#ff8fab; font-size:22px; cursor:pointer; }
+    .post-btn{ 
+      border:none; padding:12px 32px; border-radius:9999px;
+      background:linear-gradient(135deg,#ff8fab,#7ed6ff); color:white; 
+      font-weight:bold; cursor:pointer; 
+    }
+
+    /* Posts - FIXED */
+    .post{
+      background:white; 
+      border:1px solid rgba(255,143,171,0.2); 
+      border-radius:24px;
+      padding:20px; 
+      margin-bottom:20px; 
+      box-shadow:0 4px 15px rgba(0,0,0,0.05);
+      word-break: break-word;
+      overflow-wrap: break-word;
+      overflow: hidden;
+    }
+    .post-header{ display:flex; gap:12px; margin-bottom:12px; }
+    .post-user{ font-weight:700; }
+    
+    .post-content{ 
+      line-height: 1.65;
+      font-size: 16px;
+      margin: 14px 0;
+      color: #4a2c4f;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
+      hyphens: auto;
+    }
+    
+    .post-image{ width:100%; border-radius:18px; margin-top:12px; }
+
+    .post-footer{
+      margin-top:16px; 
+      padding-top:12px; 
+      border-top:1px solid #ffe4f0;
+      display:flex; 
+      gap:20px; 
+      color:#ff4d94; 
+      font-size:15px;
+    }
+    .action-btn{
+      display:flex; align-items:center; gap:6px; cursor:pointer; 
+      padding:6px 12px; border-radius:9999px; transition:0.2s;
+    }
+    .action-btn:hover{ background:rgba(255,77,148,0.1); }
+  </style>
+</head>
 <body>
 
   <div class="background-glow"></div>
@@ -19,7 +186,6 @@
     <!-- LEFT SIDEBAR -->
     <div class="sidebar">
       <div class="logo"><span>🍼</span> MAMASPACE</div>
-
       <div class="nav">
         <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i><span>Home</span></a>
         <a href="#" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>Explore</span></a>
@@ -30,20 +196,15 @@
         <a href="#" class="nav-item"><i class="fa-solid fa-envelope"></i><span>Messages</span></a>
         <a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i><span>Profile</span></a>
       </div>
-
-      <button class="share-btn">
-        <i class="fa-solid fa-feather-pointed"></i> Share Moment
-      </button>
+      <button class="share-btn"><i class="fa-solid fa-feather-pointed"></i> Share Moment</button>
     </div>
 
-    <!-- MAIN -->
+    <!-- MAIN FEED -->
     <div class="main">
-
       <div class="header">
         <h1>Home Feed</h1>
-
         <div style="display:flex; align-items:center; gap:12px;">
-          <div id="userInfo"></div>
+          <div id="userInfo" style="text-align:right; font-size:14px; color:#666;"></div>
           <div class="avatar">👩‍🍼</div>
         </div>
       </div>
@@ -54,21 +215,17 @@
           <div class="avatar">👩‍🍼</div>
           <textarea class="compose-input" placeholder="What's on your mind, mama? 💕"></textarea>
         </div>
-
         <div class="compose-actions">
           <div class="compose-icons">
             <i id="imageIcon" class="fa-solid fa-image"></i>
             <i class="fa-solid fa-heart"></i>
             <i class="fa-solid fa-baby"></i>
           </div>
-
           <button class="post-btn">Post to Mamaspace</button>
         </div>
       </div>
 
-      <!-- POSTS -->
       <div id="postsContainer"></div>
-
     </div>
 
     <!-- RIGHT SIDEBAR -->
@@ -77,29 +234,28 @@
         <i class="fa-solid fa-clock-rotate-left"></i>
         My Articles
       </h2>
-
-      <div class="articles">
+      <div style="display:flex; flex-direction:column; gap:18px;">
         <div>
-          <p class="title">My Birth Story</p>
-          <p class="meta">May 12, 2024 • 87 likes</p>
+          <p style="font-weight:600;">My Birth Story</p>
+          <p style="font-size:13px; color:#888;">May 12, 2024 • 87 likes</p>
         </div>
         <div>
-          <p class="title">Navigating Sleep Regression</p>
-          <p class="meta">Apr 28, 2024 • 152 likes</p>
+          <p style="font-weight:600;">Navigating Sleep Regression</p>
+          <p style="font-size:13px; color:#888;">Apr 28, 2024 • 152 likes</p>
         </div>
         <div>
-          <p class="title">First Foods & Fun Messes</p>
-          <p class="meta">Apr 15, 2024 • 64 likes</p>
+          <p style="font-weight:600;">First Foods & Fun Messes</p>
+          <p style="font-size:13px; color:#888;">Apr 15, 2024 • 64 likes</p>
         </div>
         <div>
-          <p class="title">Finding Mom Friends</p>
-          <p class="meta">Mar 30, 2024 • 201 likes</p>
+          <p style="font-weight:600;">Finding Mom Friends</p>
+          <p style="font-size:13px; color:#888;">Mar 30, 2024 • 201 likes</p>
         </div>
       </div>
     </div>
 
   </div>
 
-  <script type="module" src="script/main.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>
