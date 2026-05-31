@@ -51,7 +51,7 @@ onAuthStateChanged(auth, (user) => {
     userInfo.innerHTML = `Welcome back, <b>@${username}</b>`;
   } else {
     alert("Please login first");
-    window.location.href = "login.html";
+    window.location.href = "index.html";
   }
 });
 
