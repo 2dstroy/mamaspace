@@ -1,37 +1,13 @@
-<script type="module">
-// ================= IMPORTS =================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail 
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  updateDoc,
-  doc,
-  increment,
-  query,
-  orderBy,
-  serverTimestamp,
-  getDoc,
-  setDoc,
-  deleteDoc
-} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
-
-// ================= FIREBASE CONFIG =================
 const firebaseConfig = {
-  apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWjK0O8zp8",
+  apiKey: "AIzaSyBJgFsx0Aq63bbQ7mwfOI6_0pSWJkO8zp8",
   authDomain: "mamaspace-bf004.firebaseapp.com",
   projectId: "mamaspace-bf004",
   storageBucket: "mamaspace-bf004.firebasestorage.app",
@@ -39,244 +15,74 @@ const firebaseConfig = {
   appId: "1:520083469560:web:d83cec2ce32ba0fa1bf70d"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
 
-// ================= GLOBALS =================
-let currentUser = null;
-let selectedFile = null;
+// ====================== LOGIN ======================
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-// Wait for DOM to be ready
-document.addEventListener("DOMContentLoaded", () => {
-
-  // ================= DOM ELEMENTS =================
-  const postBtn = document.querySelector(".post-btn");
-  const textarea = document.querySelector(".compose-input");
-  const postsContainer = document.getElementById("postsContainer");
-  const imageIcon = document.getElementById("imageIcon");
-  const userInfo = document.getElementById("userInfo");
-
-  if (!postsContainer || !userInfo) {
-    console.error("Required DOM elements not found!");
+  if (!email || !password) {
+    alert("Please enter email and password");
     return;
   }
 
-  // File Input
-  const fileInput = document.createElement("input");
-  fileInput.type = "file";
-  fileInput.accept = "image/*";
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "index.html"; // Change to your main page
+  } catch (err) {
+    console.error(err);
+    alert("Login failed: " + err.message);
+  }
+});
 
-  imageIcon?.addEventListener("click", () => fileInput.click());
+// ====================== SIGN UP ======================
+document.getElementById("signupBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-  fileInput.addEventListener("change", (e) => {
-    selectedFile = e.target.files[0];
-    if (selectedFile) alert(`Selected: ${selectedFile.name}`);
-  });
-
-  // ================= AUTH =================
-  let authChecked = false;
-
-  onAuthStateChanged(auth, (user) => {
-    authChecked = true;
-
-    if (user) {
-      currentUser = user;
-      const username = user.email.split("@")[0];
-      userInfo.innerHTML = `Welcome back, <b>@${username}</b>`;
-    } else {
-      // Only redirect after Firebase has finished checking
-      setTimeout(() => {
-        if (!currentUser) {
-          window.location.href = "signin.html";
-        }
-      }, 700);
-    }
-  });
-
-  // ================= CREATE POST =================
-  if (postBtn) {
-    postBtn.addEventListener("click", async () => {
-      if (!currentUser) return alert("Please login first");
-
-      const text = textarea.value.trim();
-      if (!text && !selectedFile) {
-        return alert("Write something or add a photo 💕");
-      }
-
-      try {
-        let imageUrl = "";
-
-        if (selectedFile) {
-          const storageRef = ref(storage, `posts/${Date.now()}_${selectedFile.name}`);
-          await uploadBytes(storageRef, selectedFile);
-          imageUrl = await getDownloadURL(storageRef);
-        }
-
-        const username = currentUser.email.split("@")[0];
-
-        await addDoc(collection(db, "posts"), {
-          user: username,
-          username: `@${username}`,
-          email: currentUser.email,
-          userId: currentUser.uid,
-          avatar: "👩‍🍼",
-          content: text,
-          imageUrl: imageUrl,
-          likesCount: 0,
-          commentsCount: 0,
-          createdAt: serverTimestamp()
-        });
-
-        textarea.value = "";
-        selectedFile = null;
-        fileInput.value = "";
-
-        alert("Posted successfully 💕");
-
-      } catch (err) {
-        console.error(err);
-        alert("Failed to post. Please try again.");
-      }
-    });
+  if (!email || !password) {
+    alert("Please fill up signup form");
+    return;
+  }
+  if (password.length < 6) {
+    alert("Password should be at least 6 characters");
+    return;
   }
 
-  // ================= LOAD POSTS =================
-  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-
-  onSnapshot(q, (snapshot) => {
-    postsContainer.innerHTML = "";
-
-    snapshot.forEach((docSnap) => {
-      const post = docSnap.data();
-      const postId = docSnap.id;
-
-      postsContainer.innerHTML += `
-        <div class="post">
-          <div class="post-header">
-            <div class="avatar">${post.avatar || "👩‍🍼"}</div>
-            <div>
-              <div class="post-user">${post.user}</div>
-              <div style="color:#888;font-size:14px;">${post.username}</div>
-            </div>
-          </div>
-
-          <div class="post-content">${post.content || ""}</div>
-          ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Post image">` : ""}
-
-          <div class="post-footer">
-            <div class="action-btn like-btn" data-id="${postId}">
-              ❤️ ${post.likesCount || 0}
-            </div>
-            <div class="action-btn comment-btn" data-id="${postId}">
-              💬 ${post.commentsCount || 0}
-            </div>
-            <div class="action-btn delete-btn" data-id="${postId}">
-              🗑 Delete
-            </div>
-          </div>
-
-          <div class="comment-section" id="comments-${postId}" style="display:none;">
-            <div class="comment-input">
-              <input type="text" placeholder="Write a comment..." class="comment-text">
-              <button class="send-comment" data-id="${postId}">Send</button>
-            </div>
-          </div>
-        </div>
-      `;
-    });
-  });
-
-  // ================= ACTIONS (Like, Comment, Delete) =================
-  postsContainer.addEventListener("click", async (e) => {
-    if (!currentUser) return alert("Please login first");
-
-    const username = currentUser.email.split("@")[0];
-
-    // LIKE
-    if (e.target.closest(".like-btn")) {
-      const btn = e.target.closest(".like-btn");
-      const postId = btn.dataset.id;
-      const postRef = doc(db, "posts", postId);
-      const likeRef = doc(db, "posts", postId, "likes", currentUser.uid);
-
-      try {
-        const likeSnap = await getDoc(likeRef);
-        if (likeSnap.exists()) {
-          await deleteDoc(likeRef);
-          await updateDoc(postRef, { likesCount: increment(-1) });
-        } else {
-          await setDoc(likeRef, {
-            userId: currentUser.uid,
-            createdAt: serverTimestamp()
-          });
-          await updateDoc(postRef, { likesCount: increment(1) });
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Like action failed");
-      }
-    }
-
-    // TOGGLE COMMENTS
-    if (e.target.closest(".comment-btn")) {
-      const btn = e.target.closest(".comment-btn");
-      const section = document.getElementById(`comments-${btn.dataset.id}`);
-      if (section) {
-        section.style.display = section.style.display === "block" ? "none" : "block";
-      }
-    }
-
-    // SEND COMMENT
-    if (e.target.closest(".send-comment")) {
-      const btn = e.target.closest(".send-comment");
-      const input = btn.previousElementSibling;
-      const text = input.value.trim();
-      if (!text) return;
-
-      const postId = btn.dataset.id;
-      const commentsRef = collection(db, "posts", postId, "comments");
-      const postRef = doc(db, "posts", postId);
-
-      try {
-        await addDoc(commentsRef, {
-          userId: currentUser.uid,
-          username: username,
-          content: text,
-          createdAt: serverTimestamp()
-        });
-
-        await updateDoc(postRef, { commentsCount: increment(1) });
-        input.value = "";
-      } catch (err) {
-        console.error(err);
-        alert("Failed to send comment");
-      }
-    }
-
-    // DELETE POST
-    if (e.target.closest(".delete-btn")) {
-      const btn = e.target.closest(".delete-btn");
-      const postId = btn.dataset.id;
-      const postRef = doc(db, "posts", postId);
-
-      try {
-        const snap = await getDoc(postRef);
-        if (!snap.exists()) return alert("Post not found");
-
-        const post = snap.data();
-        if (post.userId !== currentUser.uid) {
-          return alert("You can only delete your own posts!");
-        }
-
-        await deleteDoc(postRef);
-        alert("Post deleted successfully 🗑");
-      } catch (err) {
-        console.error(err);
-        alert("Failed to delete post");
-      }
-    }
-  });
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    alert("Account created successfully! 🎉");
+    window.location.href = "index.html";
+  } catch (err) {
+    console.error(err);
+    alert("Sign up failed: " + err.message);
+  }
 });
-</script>
+
+// ====================== FORGOT PASSWORD ======================
+document.getElementById("forgotLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("email").value.trim();
+
+  if (!email) {
+    alert("Please enter your email first");
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Password reset link sent to your email 💌");
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+});
+
+// Optional: Press Enter to login
+document.getElementById("password").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    document.getElementById("loginBtn").click();
+  }
+});
