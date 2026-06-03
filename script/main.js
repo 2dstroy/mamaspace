@@ -66,15 +66,28 @@ fileInput.addEventListener("change", (e) => {
 });
 
 // ================= AUTH =================
+let authInitialized = false;
+
 onAuthStateChanged(auth, (user) => {
+  authInitialized = true;
+
   if (user) {
     currentUser = user;
     const username = user.email.split("@")[0];
     userInfo.innerHTML = `Welcome back, <b>@${username}</b>`;
+    
+    // Optionally load posts here if you want
   } else {
     window.location.href = "signin.html";
   }
 });
+
+// Safety fallback (in case something goes wrong)
+setTimeout(() => {
+  if (!authInitialized) {
+    window.location.href = "signin.html";
+  }
+}, 1500);
 
 // ================= CREATE POST =================
 postBtn.addEventListener("click", async () => {
